@@ -4,18 +4,22 @@ const opentripApiKey = "5ae2e3f221c38a28845f05b697184d3cd9ee672b578170059a3aa7e6
 const googleMapApiKey = "AIzaSyC4qkDl4YCkSCxSe1xwLOxSa5T2W8QWyFc";
 
 let geo = [];
-let url = "";
+let city;
 
 myForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const city = user_input.value;
+  city = user_input.value;
   const openTripAPI = `${BaseURL}?&name=${city}&apikey=${opentripApiKey}`;
   geo = await callOpenTripApi(openTripAPI);
-  //   console.log(geo);
-});
+  console.log(geo);
+  debugger
+  getGoogleMap(city);
 
-// getGoogleMap(city);
-// console.log(city);
+});
+console.log(city);
+
+
+
 
 async function callOpenTripApi(api) {
   const response = await axios.get(api);
@@ -24,14 +28,13 @@ async function callOpenTripApi(api) {
   return [lat, lon];
 }
 
-// Get google map
+// Get google map by making the API call 
 
 function getGoogleMap(city) {
-    debugger
   let cityMap = document.createElement("img");
   let cityMapSrc = `${BaseURLGoogle}center=${city}&markers=color:blue%7Clabel:S%7C11211%7C11206%7C11222&zoom=8&size=500x500&key=${googleMapApiKey}`;
   cityMap.setAttribute("src", cityMapSrc);
   cityMap.setAttribute("width", "400px");
   cityMap.setAttribute("height", "400px");
-  content.appendChild(cityMap);
+  document.getElementById("main-container").appendChild(cityMap);
 }
