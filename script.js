@@ -1,14 +1,21 @@
-// Get google map
+const BaseURL = "https://api.opentripmap.com/0.1/en/places/geoname";
 
-function getGoogleMap(){
-    let mapApi = 'https://maps.googleapis.com/maps/api/staticmap?center=${latitude}&zoom=8&size=400x400&key=AIzaSyC4qkDl4YCkSCxSe1xwLOxSa5T2W8QWyFc';
-    let img1 = document.createElement('img');
-        img1_src = 'https://maps.googleapis.com/maps/api/staticmap?center=seattle&zoom=8&size=400x400&key=AIzaSyC4qkDl4YCkSCxSe1xwLOxSa5T2W8QWyFc';
-          img1.setAttribute("src", img1_src);
-          img1.setAttribute("width", "200px");
-          img1.setAttribute("height", "200px");
-            content.appendChild(img1);
+const opentripApiKey =
+  "5ae2e3f221c38a28845f05b697184d3cd9ee672b578170059a3aa7e6";
 
+let geo = [];
+
+myForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const city = user_input.value;
+  const openTripAPI = `${BaseURL}?&name=${city}&apikey=${opentripApiKey}`;
+  geo = await callOpenTripApi(openTripAPI);
+  console.log(geo);
+});
+
+async function callOpenTripApi(api) {
+  const response = await axios.get(api);
+  const lat = response.data.lat;
+  const lon = response.data.lon;
+  return [lat, lon];
 }
-
-getGoogleMap();
