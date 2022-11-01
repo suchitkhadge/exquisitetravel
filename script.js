@@ -10,7 +10,7 @@ myForm.addEventListener("submit", async (e) => {
   const city = user_input.value;
   const openTripAPI = `${BaseURL}?&name=${city}&apikey=${opentripApiKey}`;
   geo = await callOpenTripApi(openTripAPI);
-  console.log(geo);
+  //   console.log(geo);
 });
 
 async function callOpenTripApi(api) {
