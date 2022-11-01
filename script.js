@@ -27,6 +27,7 @@ async function callOpenTripApi(api) {
 // Get google map
 
 function getGoogleMap(city) {
+    debugger
   let cityMap = document.createElement("img");
   let cityMapSrc = `${BaseURLGoogle}center=${city}&markers=color:blue%7Clabel:S%7C11211%7C11206%7C11222&zoom=8&size=500x500&key=${googleMapApiKey}`;
   cityMap.setAttribute("src", cityMapSrc);
