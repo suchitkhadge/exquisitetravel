@@ -58,7 +58,7 @@ async function callOpenTripApi(api) {
   return [lat, lon];
 }
 
-// Get google map by making the API call
+// Get google map by making the API 
 
 function getGoogleMap(city) {
   let cityMap = document.createElement("img");
@@ -108,6 +108,7 @@ function newCard(name, location, photo, description) {// Use the passed argument
   document.body.appendChild(card);
 
   return card;
+
 }
 
 
