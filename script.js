@@ -1,70 +1,81 @@
-const BaseURL = "https://api.opentripmap.com/0.1/en/places/geoname";
+const openTripBaseURL = "https://api.opentripmap.com/0.1/en/places/";
 const BaseURLGoogle = "https://maps.googleapis.com/maps/api/staticmap?";
 const opentripApiKey =
   "5ae2e3f221c38a28845f05b697184d3cd9ee672b578170059a3aa7e6";
 const googleMapApiKey = "AIzaSyC4qkDl4YCkSCxSe1xwLOxSa5T2W8QWyFc";
 
+const opentripApiKey =
+  "5ae2e3f221c38a28845f05b697184d3cd9ee672b578170059a3aa7e6";
 let geo = [];
+const radius = 20000;
+const rate = 2;
+const limit = 10;
 let city;
 
-myForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  city = user_input.value;
-  const openTripAPI = `${BaseURL}?&name=${city}&apikey=${opentripApiKey}`;
-  geo = await callOpenTripApi(openTripAPI);
-  console.log(geo);
-  debugger;
-  getGoogleMap(city);
-  
-});
-
-map.addEventListener("click", (event) => {
-  let target = event.target;
-  event.preventDefault();
-  getGoogleMap(city);
-  console.log("Getting google map");
-});
-
-restaurants.addEventListener("click", (event) => {
- 
-    let target = event.target;
-    event.preventDefault();
-    const API_URL = `https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=47.608013%2C-122.335167&radius=1500&type=restaurant&key=AIzaSyC4qkDl4YCkSCxSe1xwLOxSa5T2W8QWyFc`;
-    fetch(API_URL)
-    .then((res) => res.json())
-    .then(({ results: restaurantList}) => {
-        for (const restaurant of restaurantList) {
-            mapImg = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=Aap_uEA7vb0DDYVJWEaX3O-AtYp77AaswQKSGtDaimt3gt7QCNpdjp1BkdM6acJ96xTec3tsV_ZJNL_JP-lqsVxydG3nh739RE_hepOOL05tfJh2_ranjMadb3VoBYFvF0ma6S24qZ6QJUuV6sSRrhCskSBP5C1myCzsebztMfGvm7ij3gZT&key=AIzaSyC4qkDl4YCkSCxSe1xwLOxSa5T2W8QWyFc`
-            mapGoogleImg = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&height=200&photo_reference=${restaurant.photos[0].photo_reference}&key=AIzaSyC4qkDl4YCkSCxSe1xwLOxSa5T2W8QWyFc`
-            console.log(restaurant.name);
-            console.log(restaurant.vicinity);
-            console.log(restaurant.photos[0].photo_reference);
-            newCard(restaurant.name, restaurant.vicinity, mapGoogleImg, "description")
-            
-        }
-      console.log(restaurantList);
-
-
-      
-    
-});
-});
-
-
-async function callOpenTripApi(api) {
+async function callOpenTripApiToGetGeo(api) {
   const response = await axios.get(api);
   const lat = response.data.lat;
   const lon = response.data.lon;
   return [lat, lon];
 }
 
+myForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  city = user_input.value;
+  const openTripAPI = `${openTripBaseURL}geoname?&name=${city}&apikey=${opentripApiKey}`;
+  geo = await callOpenTripApiToGetGeo(openTripAPI);
+  getGoogleMap(city);
+  attractionBtn.addEventListener("click", showAttractionsList);
+});
+console.log(city);
+
+function showAttractionsList() {
+  //   console.log(city);//???why it's not none
+  const att = city.slice(0, 3);
+  const attractionsAPi = `${openTripBaseURL}autosuggest?name=${att}&radius=${radius}&lon=${geo[1]}&lat=${geo[0]}&rate=${rate}&limit=${limit}&apikey=${opentripApiKey}`;
+  callOpenTripApiToGetAttractionsList(attractionsAPi);
+}
+
+async function callOpenTripApiToGetAttractionsList(api) {
+  const list = document.createElement("ul");
+  const main_container = document.querySelector("#main-container");
+  main_container.innerHTML = "";
+  main_container.appendChild(list);
+  //   debugger;
+  console.log(geo[0]);
+  const response = await axios.get(api);
+  const data = response.data.features;
+  console.log(data);
+  for (const attraction of data) {
+    // debugger;
+    const listEle = document.createElement("li");
+    listEle.textContent = attraction.properties.name;
+    list.appendChild(listEle);
+    const btn = document.createElement("button");
+    btn.textContent = "Details";
+    listEle.appendChild(btn);
+  }
+}
+
 // Get google map by making the API call
 
+// function getGoogleMap(city) {
+//   let cityMap = document.createElement("img");
+//   let cityMapSrc = `${BaseURLGoogle}center=${city}&markers=color:blue%7Clabel:S%7C11211%7C11206%7C11222&zoom=8&size=500x500&key=${googleMapApiKey}`;
+//   cityMap.setAttribute("src", cityMapSrc);
+//   cityMap.setAttribute("width", "400px");
+//   cityMap.setAttribute("height", "400px");
+//   document.getElementById("main-container").appendChild(cityMap);
+// }
 function getGoogleMap(city) {
   let cityMap = document.createElement("img");
+
   let cityMapSrc = `${BaseURLGoogle}center=${city}&markers=color:blue%7Clabel:S%7C11211%7C11206%7C11222&zoom=8&size=500x500&key=${googleMapApiKey}`;
+
   cityMap.setAttribute("src", cityMapSrc);
+
   cityMap.setAttribute("width", "400px");
+
   cityMap.setAttribute("height", "400px");
   document.getElementById("main-container").innerHTML = "";
   document.getElementById("main-container").appendChild(cityMap);
