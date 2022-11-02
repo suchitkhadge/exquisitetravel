@@ -48,13 +48,14 @@ async function callOpenTripApiToGetAttractionsList(api) {
   for (const attraction of data) {
     // debugger;
     const listEle = document.createElement("li");
-    listEle.textContent = attraction.properties.name;
+    const attractionName = attraction.properties.name;
+    listEle.textContent = attractionName;
     list.appendChild(listEle);
     // const btn = document.createElement("button");
     // btn.textContent = "Details";
     const btn = detailsBtnCreator();
     listEle.appendChild(btn);
-    const modal = modalCreator();
+    const modal = modalCreator(attractionName);
     listEle.appendChild(modal);
   }
 }
@@ -70,7 +71,7 @@ function detailsBtnCreator() {
   return btn;
 }
 
-function modalCreator() {
+function modalCreator(title) {
   const firstDiv = document.createElement("div");
   firstDiv.classList.add("modal");
   firstDiv.classList.add("fade");
@@ -78,7 +79,25 @@ function modalCreator() {
   firstDiv.setAttribute("tabindex", "-1");
   firstDiv.setAttribute("aria-labelledby", "exampleModalLabel");
   firstDiv.setAttribute("aria-hidden", "true");
-  // const secDiv =
+
+  const secDiv = document.createElement("div");
+  secDiv.classList.add("modal-dialog");
+  firstDiv.appendChild(secDiv);
+
+  const thirdDiv = document.createElement("div");
+  thirdDiv.classList.add("modal-content");
+  secDiv.appendChild(thirdDiv);
+
+  const fourthDiv = document.createElement("div");
+  fourthDiv.classList.add("modal-header");
+  thirdDiv.appendChild(fourthDiv);
+
+  const h1Heading = document.createElement("h1");
+  h1Heading.classList.add("modal-title");
+  h1Heading.classList.add("fs-5");
+  h1Heading.setAttribute("id", "exampleModalLabel");
+  h1Heading.textContent = title;
+  fourthDiv.appendChild(h1Heading);
 
   return firstDiv;
 }
