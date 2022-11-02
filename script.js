@@ -30,7 +30,8 @@ console.log(city);
 function showAttractionsList() {
   //   console.log(city);//???why it's not none
   const att = city.slice(0, 3);
-  const attractionsAPi = `${openTripBaseURL}autosuggest?name=${att}&radius=${radius}&lon=${geo[1]}&lat=${geo[0]}&rate=${rate}&limit=${limit}&apikey=${opentripApiKey}`;
+  // const attractionsAPi = `${openTripBaseURL}autosuggest?name=${att}&radius=${radius}&lon=${geo[1]}&lat=${geo[0]}&rate=${rate}&limit=${limit}&apikey=${opentripApiKey}`;
+  const attractionsAPi = `${openTripBaseURL}radius?radius=${radius}&lon=${geo[1]}&lat=${geo[0]}&limit=${limit}&apikey=${opentripApiKey}`;
   callOpenTripApiToGetAttractionsList(attractionsAPi);
 }
 
@@ -49,22 +50,39 @@ async function callOpenTripApiToGetAttractionsList(api) {
     const listEle = document.createElement("li");
     listEle.textContent = attraction.properties.name;
     list.appendChild(listEle);
-    const btn = document.createElement("button");
-    btn.textContent = "Details";
+    // const btn = document.createElement("button");
+    // btn.textContent = "Details";
+    const btn = detailsBtnCreator();
     listEle.appendChild(btn);
+    const modal = modalCreator();
+    listEle.appendChild(modal);
   }
 }
 
-// Get google map by making the API call
+function detailsBtnCreator() {
+  const btn = document.createElement("button");
+  btn.textContent = "Details";
+  btn.setAttribute("type", "button");
+  btn.classList.add("btn");
+  btn.classList.add("btn-primary");
+  btn.setAttribute("data-bs-toggle", "modal");
+  btn.setAttribute("data-bs-target", "#exampleModal");
+  return btn;
+}
 
-// function getGoogleMap(city) {
-//   let cityMap = document.createElement("img");
-//   let cityMapSrc = `${BaseURLGoogle}center=${city}&markers=color:blue%7Clabel:S%7C11211%7C11206%7C11222&zoom=8&size=500x500&key=${googleMapApiKey}`;
-//   cityMap.setAttribute("src", cityMapSrc);
-//   cityMap.setAttribute("width", "400px");
-//   cityMap.setAttribute("height", "400px");
-//   document.getElementById("main-container").appendChild(cityMap);
-// }
+function modalCreator() {
+  const firstDiv = document.createElement("div");
+  firstDiv.classList.add("modal");
+  firstDiv.classList.add("fade");
+  firstDiv.setAttribute("id", "exampleModal");
+  firstDiv.setAttribute("tabindex", "-1");
+  firstDiv.setAttribute("aria-labelledby", "exampleModalLabel");
+  firstDiv.setAttribute("aria-hidden", "true");
+  // const secDiv =
+
+  return firstDiv;
+}
+
 function getGoogleMap(city) {
   let cityMap = document.createElement("img");
 
