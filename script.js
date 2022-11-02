@@ -25,7 +25,6 @@ myForm.addEventListener("submit", async (e) => {
   const openTripAPI = `${openTripBaseURL}geoname?&name=${city}&apikey=${opentripApiKey}`;
   geo = await callOpenTripApiToGetGeo(openTripAPI);
   getGoogleMap(city);
-  attractionBtn.addEventListener("click", showAttractionsList);
 });
 console.log(city);
 
