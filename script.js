@@ -25,11 +25,9 @@ myForm.addEventListener("submit", async (e) => {
   getGoogleMap(city);
   attractionBtn.addEventListener("click", showAttractionsList);
 });
-console.log(city);
 
 function showAttractionsList() {
   const att = city.slice(0, 3);
-  // const attractionsAPi = `${openTripBaseURL}autosuggest?name=${att}&radius=${radius}&lon=${geo[1]}&lat=${geo[0]}&rate=${rate}&limit=${limit}&apikey=${opentripApiKey}`;
   const attractionsAPi = `${openTripBaseURL}radius?radius=${radius}&lon=${geo[1]}&lat=${geo[0]}&limit=${limit}&apikey=${opentripApiKey}`;
   callOpenTripApiToGetAttractionsList(attractionsAPi);
 }
@@ -50,12 +48,17 @@ async function callOpenTripApiToGetAttractionsList(api) {
     const attractionName = attraction.properties.name;
     listEle.textContent = attractionName;
     list.appendChild(listEle);
-    const id = attractionName.slice(0, 2);
+    const id = attraction.properties.xid;
     const btn = detailsBtnCreator(id);
     listEle.appendChild(btn);
-    const modal = modalCreator(id, attractionName);
+    const modal = await modalCreator(id, attractionName);
     listEle.appendChild(modal);
   }
+}
+
+async function getAttractionDetail(api) {
+  const res = await axios.get(api);
+  return res;
 }
 
 function detailsBtnCreator(id) {
@@ -69,7 +72,7 @@ function detailsBtnCreator(id) {
   return btn;
 }
 
-function modalCreator(id, title) {
+async function modalCreator(id, title) {
   const firstDiv = document.createElement("div");
   firstDiv.classList.add("modal");
   firstDiv.classList.add("fade");
@@ -106,11 +109,8 @@ function modalCreator(id, title) {
   closeBtn.setAttribute("aria-label", "Close");
   fourthDiv.appendChild(closeBtn);
 
-  // const bodyDiv = document.createElement("div");
-  const url =
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Seattle_Central_Library%2C_Seattle%2C_Washington_-_20060418.jpg/300px-Seattle_Central_Library%2C_Seattle%2C_Washington_-_20060418.jpg";
-  const des =
-    "The Seattle Central Library is the flagship library of the Seattle Public Library system. The 11-story (185 feet or 56.9 meters high) glass and steel building in downtown Seattle, Washington was opened to the public on May 23, 2004.";
+  const url = await getImg(id);
+  const des = await getDescription(id);
   const add = "3342,seattle";
 
   const cardDiv = CardDivCreator(url, des, add);
@@ -130,6 +130,38 @@ function modalCreator(id, title) {
 
   return firstDiv;
 }
+
+async function getImg(id) {
+  const attractionDetailsApi = `${openTripBaseURL}xid/${id}?apikey=${opentripApiKey}`;
+  // debugger;
+  const res = await getAttractionDetail(attractionDetailsApi);
+  let url;
+
+  if (res.data.hasOwnProperty("preview")) {
+    url = res.data.preview.source;
+  } else {
+    // go to unsplash api to get a photo
+    url =
+      "https://www.adobe.com/content/dam/cc/us/en/creativecloud/file-types/image/raster/jpeg-file/OG-1200x800-jpeg.jpg";
+  }
+  return url;
+}
+
+async function getDescription(id) {
+  const attractionDetailsApi = `${openTripBaseURL}xid/${id}?apikey=${opentripApiKey}`;
+  // debugger;
+  const res = await getAttractionDetail(attractionDetailsApi);
+  let des;
+
+  if (res.data.hasOwnProperty("wikipedia_extracts")) {
+    des = res.data.wikipedia_extracts.text;
+  } else {
+    // go to unsplash api to get a photo
+    des = "some text";
+  }
+  return des;
+}
+
 function addClassName(ele, className) {
   return ele.classList.add(className);
 }
