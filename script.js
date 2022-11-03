@@ -7,16 +7,20 @@ const openWeatherApiKey = "bee1ae44576d679f5012d45660e1473a";
 const opentripApiKey =
   "5ae2e3f221c38a28845f05b697184d3cd9ee672b578170059a3aa7e6";
 let geo = [];
-const radius = 20000;
-const rate = 2;
+const radius = 10000;
+const rate = 3;
 const limit = 10;
 let city;
 
 async function callOpenTripApiToGetGeo(api) {
-  const response = await axios.get(api);
-  const lat = response.data.lat;
-  const lon = response.data.lon;
-  return [lat, lon];
+  try {
+    const response = await axios.get(api);
+    const lat = response.data.lat;
+    const lon = response.data.lon;
+    return [lat, lon];
+  } catch (err) {
+    alert(err);
+  }
 }
 
 myForm.addEventListener("submit", async (e) => {
@@ -42,37 +46,48 @@ function showWeather() {
 
 function showAttractionsList() {
   const att = city.slice(0, 3);
-  const attractionsAPi = `${openTripBaseURL}radius?radius=${radius}&lon=${geo[1]}&lat=${geo[0]}&limit=${limit}&apikey=${opentripApiKey}`;
+  // https://api.opentripmap.com/0.1/en/places/radius?radius=10000&lon=-122.33207&lat=47.60621&src_attr=wikidata&kinds=amusements%2Cinteresting_places&rate=3&limit=10&apikey=5ae2e3f221c38a28845f05b697184d3cd9ee672b578170059a3aa7e6
+
+  debugger;
+  const attractionsAPi = `${openTripBaseURL}radius?radius=${radius}&lon=${geo[1]}&lat=${geo[0]}&src_attr=wikidata&kinds=amusements%2Cinteresting_places&rate=${rate}&apikey=${opentripApiKey}&limit=${limit}&SameSite=None`;
   callOpenTripApiToGetAttractionsList(attractionsAPi);
 }
 
 async function callOpenTripApiToGetAttractionsList(api) {
-  const list = document.createElement("ul");
-  const main_container = document.querySelector("#main-container");
-  main_container.innerHTML = "";
-  main_container.appendChild(list);
-  //   debugger;
-  console.log(geo[0]);
-  const response = await axios.get(api);
-  const data = response.data.features;
-  console.log(data);
-  for (const attraction of data) {
-    // debugger;
-    const listEle = document.createElement("li");
-    const attractionName = attraction.properties.name;
-    listEle.textContent = attractionName;
-    list.appendChild(listEle);
-    const id = attraction.properties.xid;
-    const btn = detailsBtnCreator(id);
-    listEle.appendChild(btn);
-    const modal = await modalCreator(id, attractionName);
-    listEle.appendChild(modal);
+  try {
+    const list = document.createElement("ul");
+    const main_container = document.querySelector("#main-container");
+    main_container.innerHTML = "";
+    main_container.appendChild(list);
+    //   debugger;
+    console.log(geo[0]);
+    const response = await axios.get(api);
+    const data = response.data.features;
+    console.log(data);
+    for (const attraction of data) {
+      // debugger;
+      const listEle = document.createElement("li");
+      const attractionName = attraction.properties.name;
+      listEle.textContent = attractionName;
+      list.appendChild(listEle);
+      const id = attraction.properties.xid;
+      const btn = detailsBtnCreator(id);
+      listEle.appendChild(btn);
+      const modal = await modalCreator(id, attractionName);
+      listEle.appendChild(modal);
+    }
+  } catch (err) {
+    alert(err);
   }
 }
 
 async function getAttractionDetail(api) {
-  const res = await axios.get(api);
-  return res;
+  try {
+    const res = await axios.get(api);
+    return res;
+  } catch (err) {
+    alert(err);
+  }
 }
 
 function detailsBtnCreator(id) {
@@ -123,11 +138,14 @@ async function modalCreator(id, title) {
   closeBtn.setAttribute("aria-label", "Close");
   fourthDiv.appendChild(closeBtn);
 
-  const url = await getImg(id);
-  const des = await getDescription(id);
-  const add = "3342,seattle";
+  const result = await getImgDescriptionAddressAndWikiLink(id);
 
-  const cardDiv = CardDivCreator(url, des, add);
+  const url = result[0];
+  const des = result[1];
+  const add = result[2];
+  const wiki = result[3];
+
+  const cardDiv = CardDivCreator(url, des, add, wiki);
   thirdDiv.appendChild(cardDiv);
 
   const footerDiv = document.createElement("div");
@@ -145,44 +163,58 @@ async function modalCreator(id, title) {
   return firstDiv;
 }
 
-async function getImg(id) {
-  const attractionDetailsApi = `${openTripBaseURL}xid/${id}?apikey=${opentripApiKey}`;
-  // debugger;
-  const res = await getAttractionDetail(attractionDetailsApi);
-  let url;
+async function getImgDescriptionAddressAndWikiLink(id) {
+  try {
+    const attractionDetailsApi = `${openTripBaseURL}xid/${id}?apikey=${opentripApiKey}`;
+    // debugger;
+    const res = await getAttractionDetail(attractionDetailsApi);
+    let url;
+    let description;
 
-  if (res.data.hasOwnProperty("preview")) {
-    url = res.data.preview.source;
-  } else {
-    // go to unsplash api to get a photo
-    url =
-      "https://www.adobe.com/content/dam/cc/us/en/creativecloud/file-types/image/raster/jpeg-file/OG-1200x800-jpeg.jpg";
+    if (res.data.hasOwnProperty("preview")) {
+      url = res.data.preview.source;
+    } else {
+      url = "https://source.unsplash.com/random";
+    }
+
+    if (res.data.hasOwnProperty("wikipedia_extracts")) {
+      description = res.data.wikipedia_extracts.text;
+    } else {
+      description = `The kinds of this place is: ${res.data.kinds}. Congratulations you find a secret place and we don't have more information about here.`;
+    }
+
+    const addressObj = res.data.address;
+    const address = `${addressObj.house_number} ${addressObj.road}, ${addressObj.city}, ${addressObj.state} ${addressObj.postcode}`;
+
+    const wikiLink = res.data.wikipedia;
+
+    return [url, description, address, wikiLink];
+  } catch (err) {
+    alert(err);
   }
-  return url;
 }
 
-async function getDescription(id) {
-  const attractionDetailsApi = `${openTripBaseURL}xid/${id}?apikey=${opentripApiKey}`;
-  // debugger;
-  const res = await getAttractionDetail(attractionDetailsApi);
-  let des;
-
-  if (res.data.hasOwnProperty("wikipedia_extracts")) {
-    des = res.data.wikipedia_extracts.text;
-  } else {
-    // go to unsplash api to get a photo
-    des = "some text";
+async function getAddress(id) {
+  try {
+    const attractionDetailsApi = `${openTripBaseURL}xid/${id}?apikey=${opentripApiKey}`;
+    // debugger;
+    const res = await getAttractionDetail(attractionDetailsApi);
+    const addressObj = res.data.address;
+    const address = `${addressObj.house_number} ${addressObj.road}, ${addressObj.city}, ${addressObj.state} ${addressObj.postcode}`;
+    return address;
+  } catch (err) {
+    alert(err);
   }
-  return des;
 }
 
 function addClassName(ele, className) {
   return ele.classList.add(className);
 }
 
-function CardDivCreator(imgUrl, description, address) {
+function CardDivCreator(imgUrl, description, address, wiki) {
   const cardDiv = document.createElement("div");
   addClassName(cardDiv, "card");
+  addClassName(cardDiv, "text-center");
   // cardDiv.setAttribute("style", "width: 18rem;");
 
   const image = document.createElement("img");
@@ -190,23 +222,36 @@ function CardDivCreator(imgUrl, description, address) {
   image.setAttribute("src", imgUrl);
   cardDiv.appendChild(image);
 
-  // const cardBodyDiv = document.createElement("div");
-  // addClassName(cardBodyDiv, "card-body");
-  // cardDiv.appendChild(cardBodyDiv);
+  const cardBodyDiv = document.createElement("div");
+  addClassName(cardBodyDiv, "card-body");
+  cardDiv.appendChild(cardBodyDiv);
+
   const list = document.createElement("ul");
   addClassName(list, "list-group");
   addClassName(list, "list-group-flush");
-  cardDiv.appendChild(list);
+  cardBodyDiv.appendChild(list);
 
   const listItem1 = document.createElement("li");
   addClassName(listItem1, "list-group-item");
   listItem1.textContent = description;
   list.appendChild(listItem1);
 
+  const h6Heading = document.createElement("h6");
+  h6Heading.textContent = "Address:";
+  list.appendChild(h6Heading);
+
   const listItem2 = document.createElement("li");
   addClassName(listItem2, "list-group-item");
   listItem2.textContent = address;
   list.appendChild(listItem2);
+
+  const wikiBtn = document.createElement("a");
+  wikiBtn.setAttribute("href", wiki);
+  wikiBtn.setAttribute("target", "_blank");
+  addClassName(wikiBtn, "btn");
+  addClassName(wikiBtn, "btn-primary");
+  wikiBtn.textContent = "Go Wikipedia";
+  cardBodyDiv.appendChild(wikiBtn);
 
   return cardDiv;
 }
