@@ -12,6 +12,10 @@ const rate = 3;
 const limit = 10;
 let city;
 
+function addClassName(ele, className) {
+  return ele.classList.add(className);
+}
+
 async function callOpenTripApiToGetGeo(api) {
   try {
     const response = await axios.get(api);
@@ -19,7 +23,7 @@ async function callOpenTripApiToGetGeo(api) {
     const lon = response.data.lon;
     return [lat, lon];
   } catch (err) {
-    alert(err);
+    console.log(err);
   }
 }
 
@@ -29,26 +33,23 @@ myForm.addEventListener("submit", async (e) => {
   const openTripAPI = `${openTripBaseURL}geoname?&name=${city}&apikey=${opentripApiKey}`;
   geo = await callOpenTripApiToGetGeo(openTripAPI);
   getGoogleMap(city);
-  attractionBtn.addEventListener("click", showAttractionsList)
-  
-  weatherBtn.addEventListener("click",showWeather);
-})
+  attractionBtn.addEventListener("click", showAttractionsList);
 
+  weatherBtn.addEventListener("click", showWeather);
+});
 
 function showWeather() {
-  fetch(`${openWeatherBaseURL}lat=${geo[0]}&lon=${geo[1]}&appid=${openWeatherApiKey}`)
-  .then(response => response.json())
-  .then(data => console.log(data))
-  
-  .catch(err => alert("City not found!"))
-  
+  fetch(
+    `${openWeatherBaseURL}lat=${geo[0]}&lon=${geo[1]}&appid=${openWeatherApiKey}`
+  )
+    .then((response) => response.json())
+    .then((data) => console.log(data))
+
+    .catch((err) => console.log("City not found!"));
 }
 
 function showAttractionsList() {
   const att = city.slice(0, 3);
-  // https://api.opentripmap.com/0.1/en/places/radius?radius=10000&lon=-122.33207&lat=47.60621&src_attr=wikidata&kinds=amusements%2Cinteresting_places&rate=3&limit=10&apikey=5ae2e3f221c38a28845f05b697184d3cd9ee672b578170059a3aa7e6
-
-  debugger;
   const attractionsAPi = `${openTripBaseURL}radius?radius=${radius}&lon=${geo[1]}&lat=${geo[0]}&src_attr=wikidata&kinds=amusements%2Cinteresting_places&rate=${rate}&apikey=${opentripApiKey}&limit=${limit}&SameSite=None`;
   callOpenTripApiToGetAttractionsList(attractionsAPi);
 }
@@ -59,13 +60,12 @@ async function callOpenTripApiToGetAttractionsList(api) {
     const main_container = document.querySelector("#main-container");
     main_container.innerHTML = "";
     main_container.appendChild(list);
-    //   debugger;
+
     console.log(geo[0]);
     const response = await axios.get(api);
     const data = response.data.features;
     console.log(data);
     for (const attraction of data) {
-      // debugger;
       const listEle = document.createElement("li");
       const attractionName = attraction.properties.name;
       listEle.textContent = attractionName;
@@ -77,7 +77,7 @@ async function callOpenTripApiToGetAttractionsList(api) {
       listEle.appendChild(modal);
     }
   } catch (err) {
-    alert(err);
+    console.log(err);
   }
 }
 
@@ -86,7 +86,7 @@ async function getAttractionDetail(api) {
     const res = await axios.get(api);
     return res;
   } catch (err) {
-    alert(err);
+    console.log(err);
   }
 }
 
@@ -94,73 +94,84 @@ function detailsBtnCreator(id) {
   const btn = document.createElement("button");
   btn.textContent = "Details";
   btn.setAttribute("type", "button");
-  btn.classList.add("btn");
-  btn.classList.add("btn-primary");
+  addClassName(btn, "btn");
+  addClassName(btn, "btn-primary");
   btn.setAttribute("data-bs-toggle", "modal");
   btn.setAttribute("data-bs-target", `#${id}`);
   return btn;
 }
 
 async function modalCreator(id, title) {
-  const firstDiv = document.createElement("div");
-  firstDiv.classList.add("modal");
-  firstDiv.classList.add("fade");
-  firstDiv.setAttribute("id", id);
-  firstDiv.setAttribute("tabindex", "-1");
-  firstDiv.setAttribute("aria-labelledby", "exampleModalLabel");
-  firstDiv.setAttribute("aria-hidden", "true");
+  try {
+    const firstDiv = document.createElement("div");
+    addClassName(firstDiv, "modal");
+    addClassName(firstDiv, "fade");
+    firstDiv.setAttribute("id", id);
+    firstDiv.setAttribute("tabindex", "-1");
+    firstDiv.setAttribute("aria-labelledby", "exampleModalLabel");
+    firstDiv.setAttribute("aria-hidden", "true");
 
-  const secDiv = document.createElement("div");
-  secDiv.classList.add("modal-dialog");
-  firstDiv.appendChild(secDiv);
+    const secDiv = document.createElement("div");
+    addClassName(secDiv, "modal-dialog");
+    firstDiv.appendChild(secDiv);
 
-  const thirdDiv = document.createElement("div");
-  thirdDiv.classList.add("modal-content");
-  secDiv.appendChild(thirdDiv);
+    const thirdDiv = document.createElement("div");
+    addClassName(thirdDiv, "modal-content");
+    // thirdDiv.classList.add("modal-content");
+    secDiv.appendChild(thirdDiv);
 
-  const fourthDiv = document.createElement("div");
-  fourthDiv.classList.add("modal-header");
-  thirdDiv.appendChild(fourthDiv);
+    const fourthDiv = document.createElement("div");
+    addClassName(fourthDiv, "modal-header");
+    // fourthDiv.classList.add("modal-header");
+    thirdDiv.appendChild(fourthDiv);
 
-  const h5Heading = document.createElement("h5");
-  h5Heading.classList.add("modal-title");
-  h5Heading.classList.add("fs-5");
-  h5Heading.setAttribute("id", "exampleModalLabel");
-  console.log("title is", title);
-  // debugger;
-  h5Heading.textContent = title;
-  fourthDiv.appendChild(h5Heading);
+    const h5Heading = document.createElement("h5");
+    addClassName(h5Heading, "modal-title");
+    addClassName(h5Heading, "fs-5");
 
-  const closeBtn = document.createElement("button");
-  closeBtn.setAttribute("type", "button");
-  closeBtn.classList.add("btn-close");
-  closeBtn.setAttribute("data-bs-dismiss", "modal");
-  closeBtn.setAttribute("aria-label", "Close");
-  fourthDiv.appendChild(closeBtn);
+    // h5Heading.classList.add("modal-title");
+    // h5Heading.classList.add("fs-5");
+    h5Heading.setAttribute("id", "exampleModalLabel");
+    console.log("title is", title);
+    // debugger;
+    h5Heading.textContent = title;
+    fourthDiv.appendChild(h5Heading);
 
-  const result = await getImgDescriptionAddressAndWikiLink(id);
+    const closeBtn = document.createElement("button");
+    closeBtn.setAttribute("type", "button");
+    addClassName(closeBtn, "btn-close");
+    // closeBtn.classList.add("btn-close");
+    closeBtn.setAttribute("data-bs-dismiss", "modal");
+    closeBtn.setAttribute("aria-label", "Close");
+    fourthDiv.appendChild(closeBtn);
 
-  const url = result[0];
-  const des = result[1];
-  const add = result[2];
-  const wiki = result[3];
+    const result = await getImgDescriptionAddressAndWikiLink(id);
 
-  const cardDiv = CardDivCreator(url, des, add, wiki);
-  thirdDiv.appendChild(cardDiv);
+    const url = result[0];
+    const des = result[1];
+    const add = result[2];
+    const wiki = result[3];
 
-  const footerDiv = document.createElement("div");
-  footerDiv.classList.add("modal-footer");
-  thirdDiv.appendChild(footerDiv);
+    const cardDiv = CardDivCreator(url, des, add, wiki);
+    thirdDiv.appendChild(cardDiv);
 
-  const footerBtn = document.createElement("button");
-  footerBtn.setAttribute("type", "button");
-  addClassName(footerBtn, "btn");
-  addClassName(footerBtn, "btn-secondary");
-  footerBtn.setAttribute("data-bs-dismiss", "modal");
-  footerBtn.textContent = "Close";
-  footerDiv.appendChild(footerBtn);
+    const footerDiv = document.createElement("div");
+    addClassName(footerDiv, "modal-footer");
+    // footerDiv.classList.add("modal-footer");
+    thirdDiv.appendChild(footerDiv);
 
-  return firstDiv;
+    const footerBtn = document.createElement("button");
+    footerBtn.setAttribute("type", "button");
+    addClassName(footerBtn, "btn");
+    addClassName(footerBtn, "btn-secondary");
+    footerBtn.setAttribute("data-bs-dismiss", "modal");
+    footerBtn.textContent = "Close";
+    footerDiv.appendChild(footerBtn);
+
+    return firstDiv;
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 async function getImgDescriptionAddressAndWikiLink(id) {
@@ -190,7 +201,7 @@ async function getImgDescriptionAddressAndWikiLink(id) {
 
     return [url, description, address, wikiLink];
   } catch (err) {
-    alert(err);
+    console.log(err);
   }
 }
 
@@ -203,12 +214,8 @@ async function getAddress(id) {
     const address = `${addressObj.house_number} ${addressObj.road}, ${addressObj.city}, ${addressObj.state} ${addressObj.postcode}`;
     return address;
   } catch (err) {
-    alert(err);
+    console.log(err);
   }
-}
-
-function addClassName(ele, className) {
-  return ele.classList.add(className);
 }
 
 function CardDivCreator(imgUrl, description, address, wiki) {
@@ -271,4 +278,3 @@ function getGoogleMap(city) {
 
   document.getElementById("main-container").appendChild(cityMap);
 }
-
