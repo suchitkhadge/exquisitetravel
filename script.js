@@ -1,64 +1,102 @@
-const BaseURL = "https://api.opentripmap.com/0.1/en/places/geoname";
-const BaseURLGoogle = "https://maps.googleapis.com/maps/api/staticmap?";
+const openTripBaseURL = "https://api.opentripmap.com/0.1/en/places/";
 const opentripApiKey =
   "5ae2e3f221c38a28845f05b697184d3cd9ee672b578170059a3aa7e6";
+const BaseURLGoogle = "https://maps.googleapis.com/maps/api/staticmap?";
 const googleMapApiKey = "AIzaSyC4qkDl4YCkSCxSe1xwLOxSa5T2W8QWyFc";
+const openWeatherBaseURL = "https://api.openweathermap.org/data/3.0/onecall?";
+const openWeatherApiKey = "bee1ae44576d679f5012d45660e1473a";
 
 let geo = [];
+const radius = 20000;
+const rate = 2;
+const limit = 10;
 let city;
 
-myForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  city = user_input.value;
-  const openTripAPI = `${BaseURL}?&name=${city}&apikey=${opentripApiKey}`;
-  geo = await callOpenTripApi(openTripAPI);
-  console.log(geo);
-  debugger;
-  getGoogleMap(city);
-  
-});
-
-map.addEventListener("click", (event) => {
-  let target = event.target;
-  event.preventDefault();
-  getGoogleMap(city);
-  console.log("Getting google map");
-});
-
-restaurants.addEventListener("click", (event) => {
- 
-    let target = event.target;
-    event.preventDefault();
-    const API_URL = `https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=47.608013%2C-122.335167&radius=1500&type=restaurant&key=AIzaSyC4qkDl4YCkSCxSe1xwLOxSa5T2W8QWyFc`;
-    fetch(API_URL)
-    .then((res) => res.json())
-    .then(({ results: restaurantList}) => {
-        for (const restaurant of restaurantList) {
-            mapImg = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=Aap_uEA7vb0DDYVJWEaX3O-AtYp77AaswQKSGtDaimt3gt7QCNpdjp1BkdM6acJ96xTec3tsV_ZJNL_JP-lqsVxydG3nh739RE_hepOOL05tfJh2_ranjMadb3VoBYFvF0ma6S24qZ6QJUuV6sSRrhCskSBP5C1myCzsebztMfGvm7ij3gZT&key=AIzaSyC4qkDl4YCkSCxSe1xwLOxSa5T2W8QWyFc`
-            mapGoogleImg = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&height=200&photo_reference=${restaurant.photos[0].photo_reference}&key=AIzaSyC4qkDl4YCkSCxSe1xwLOxSa5T2W8QWyFc`
-            console.log(restaurant.name);
-            console.log(restaurant.vicinity);
-            console.log(restaurant.photos[0].photo_reference);
-            newCard(restaurant.name, restaurant.vicinity, mapGoogleImg, "description")
-            
-        }
-      console.log(restaurantList);
-
-
-      
-    
-});
-});
-
-
-async function callOpenTripApi(api) {
+async function callOpenTripApiToGetGeo(api) {
   const response = await axios.get(api);
   const lat = response.data.lat;
   const lon = response.data.lon;
   return [lat, lon];
 }
 
-// Get google map by making the API 
+myForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  city = user_input.value;
+  const openTripAPI = `${openTripBaseURL}geoname?&name=${city}&apikey=${opentripApiKey}`;
+  geo = await callOpenTripApiToGetGeo(openTripAPI);
+  getGoogleMap(city);
+  attractionBtn.addEventListener("click", showAttractionsList);
+  restaurantsBtn.addEventListener("click", showRestaurantList);
+  mapBtn.addEventListener("click", getGoogleMap(city));
+  weatherBtn.addEventListener("click",showWeather);
+});
+console.log(city);
+
+function showWeather() {
+  fetch(`${openWeatherBaseURL}lat=${geo[0]}&lon=${geo[1]}&appid=${openWeatherApiKey}`)
+  .then(response => response.json())
+  .then(data => console.log(data))
+  
+  .catch(err => alert("City not found!"))
+  
+}
+
+function showAttractionsList() {
+  const att = city.slice(0, 3);
+  const attractionsAPi = `${openTripBaseURL}radius?radius=${radius}&lon=${geo[1]}&lat=${geo[0]}&limit=${limit}&apikey=${opentripApiKey}`;
+  callOpenTripApiToGetAttractionsList(attractionsAPi);
+}
+
+
+async function showRestaurantList() {
+  document.getElementById("main-container").innerHTML = " ";
+  const list2 = document.createElement("ul");
+  document.getElementById("main-container").appendChild(list2);
+  const API_URL = `https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${geo[0]}%2C${geo[1]}&radius=1500&type=restaurant&key=AIzaSyC4qkDl4YCkSCxSe1xwLOxSa5T2W8QWyFc`;
+  fetch(API_URL)
+    .then((res) => res.json())
+    .then(async ({ results: restaurantList }) => {
+      for (const restaurant of restaurantList) {
+        const listEle2 = document.createElement("li");
+        listEle2.textContent = restaurant.name;
+        list2.appendChild(listEle2);
+        const mapGoogleImg = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&height=400&photo_reference=${restaurant.photos[0].photo_reference}&key=AIzaSyC4qkDl4YCkSCxSe1xwLOxSa5T2W8QWyFc`;
+
+        const btn2 = detailsBtnCreator(restaurant.photos[0].photo_reference);
+        listEle2.appendChild(btn2);
+        // debugger
+       // console.log(mapGoogleImg);
+        console.log(restaurant.photos[0].photo_reference);
+        console.log(restaurant.vicinity);
+  
+        const modal2 =  await modalCreator3(restaurant.photos[0].photo_reference, restaurant.name, mapGoogleImg, restaurant.vicinity);
+        listEle2.appendChild(modal2);
+      }
+      console.log(restaurantList);
+    });
+}
+
+function detailsBtnCreator() {
+  const btn = document.createElement("button");
+  btn.textContent = "Details";
+  btn.setAttribute("type", "button");
+  btn.classList.add("btn");
+  btn.classList.add("btn-primary");
+  btn.setAttribute("data-bs-toggle", "modal");
+  btn.setAttribute("data-bs-target", "#exampleModal");
+  return btn;
+}
+
+function modalCreator2() {
+  const firstDiv = document.createElement("div");
+  firstDiv.classList.add("modal");
+  firstDiv.classList.add("fade");
+  firstDiv.setAttribute("id", "exampleModal");
+  firstDiv.setAttribute("tabindex", "-1");
+  firstDiv.setAttribute("aria-labelledby", "exampleModalLabel");
+  firstDiv.setAttribute("aria-hidden", "true");
+  return firstDiv;
+}
 
 function getGoogleMap(city) {
   let cityMap = document.createElement("img");
@@ -66,54 +104,231 @@ function getGoogleMap(city) {
   cityMap.setAttribute("src", cityMapSrc);
   cityMap.setAttribute("width", "400px");
   cityMap.setAttribute("height", "400px");
+  cityMap.setAttribute("id", "googleMap");
   document.getElementById("main-container").innerHTML = "";
   document.getElementById("main-container").appendChild(cityMap);
 }
 
 
+async function callOpenTripApiToGetAttractionsList(api) {
+  const list = document.createElement("ul");
+  const main_container = document.querySelector("#main-container");
+  main_container.innerHTML = "";
+  main_container.appendChild(list);
+  //   debugger;
+  console.log(geo[0]);
+  const response = await axios.get(api);
+  const data = response.data.features;
+  console.log(data);
+  for (const attraction of data) {
+    // debugger;
+    const listEle = document.createElement("li");
+    const attractionName = attraction.properties.name;
+    listEle.textContent = attractionName;
+    list.appendChild(listEle);
+    const id = attraction.properties.xid;
+    const btn = detailsBtnCreator(id);
+    listEle.appendChild(btn);
+    const modal = await modalCreator(id, attractionName);
+    listEle.appendChild(modal);
+  }
+}
 
-function newCard(name, location, photo, description) {// Use the passed arguments to create a bootstrap card with destination details
-  let card = document.createElement("div");
-  card.setAttribute("class", "card");
-  card.style.width = "10rem";
-  card.style.height = "fit-content";
-  card.style.margin = "5px;";
+async function getAttractionDetail(api) {
+  const res = await axios.get(api);
+  return res;
+}
 
-  // Create the destination card
-  let img = document.createElement("img");
-  img.setAttribute("class", "card-img-top");
-  img.setAttribute("alt", name);
-  img.setAttribute("src", photo);
-  card.appendChild(img);
-  let cardBody = document.createElement("div");
-  cardBody.setAttribute("class", "card-body");
+function detailsBtnCreator(id) {
+  const btn = document.createElement("button");
+  btn.textContent = "Details";
+  btn.setAttribute("type", "button");
+  btn.classList.add("btn");
+  btn.classList.add("btn-primary");
+  btn.setAttribute("data-bs-toggle", "modal");
+  btn.setAttribute("data-bs-target", `#${id}`);
+  return btn;
+}
 
-  let cardTitle = document.createElement("p");
-  cardTitle.setAttribute("class", "card-title");
-  cardTitle.innerText = name;
-  cardBody.appendChild(cardTitle);
+async function modalCreator(id, title) {
+  const firstDiv = document.createElement("div");
+  firstDiv.classList.add("modal");
+  firstDiv.classList.add("fade");
+  firstDiv.setAttribute("id", id);
+  firstDiv.setAttribute("tabindex", "-1");
+  firstDiv.setAttribute("aria-labelledby", "exampleModalLabel");
+  firstDiv.setAttribute("aria-hidden", "true");
 
-  let cardSubtitle = document.createElement("p");
-  cardSubtitle.setAttribute("class", "card-subtitle mb-2 text-muted");
-  cardSubtitle.innerText = location;
-  cardBody.appendChild(cardSubtitle);
+  const secDiv = document.createElement("div");
+  secDiv.classList.add("modal-dialog");
+  firstDiv.appendChild(secDiv);
 
-  var buttonsContainer = document.createElement("div");
-  buttonsContainer.setAttribute("class", "buttons_container");
+  const thirdDiv = document.createElement("div");
+  thirdDiv.classList.add("modal-content");
+  secDiv.appendChild(thirdDiv);
 
-  
-  cardBody.appendChild(buttonsContainer);
+  const fourthDiv = document.createElement("div");
+  fourthDiv.classList.add("modal-header");
+  thirdDiv.appendChild(fourthDiv);
 
-  card.appendChild(cardBody);
-  document.body.appendChild(card);
+  const h5Heading = document.createElement("h5");
+  h5Heading.classList.add("modal-title");
+  h5Heading.classList.add("fs-5");
+  h5Heading.setAttribute("id", "exampleModalLabel");
+  console.log("title is", title);
+  // debugger;
+  h5Heading.textContent = title;
+  fourthDiv.appendChild(h5Heading);
 
-  return card;
+  const closeBtn = document.createElement("button");
+  closeBtn.setAttribute("type", "button");
+  closeBtn.classList.add("btn-close");
+  closeBtn.setAttribute("data-bs-dismiss", "modal");
+  closeBtn.setAttribute("aria-label", "Close");
+  fourthDiv.appendChild(closeBtn);
 
+  const url = await getImg(id);
+  const des = await getDescription(id);
+  const add = "3342,seattle";
+
+  const cardDiv = CardDivCreator(url, des, add);
+  thirdDiv.appendChild(cardDiv);
+
+  const footerDiv = document.createElement("div");
+  footerDiv.classList.add("modal-footer");
+  thirdDiv.appendChild(footerDiv);
+
+  const footerBtn = document.createElement("button");
+  footerBtn.setAttribute("type", "button");
+  addClassName(footerBtn, "btn");
+  addClassName(footerBtn, "btn-secondary");
+  footerBtn.setAttribute("data-bs-dismiss", "modal");
+  footerBtn.textContent = "Close";
+  footerDiv.appendChild(footerBtn);
+
+  return firstDiv;
 }
 
 
 
-
+async function modalCreator3(id, title, urls, vicinity) {
   
+  const firstDiv = document.createElement("div");
+  firstDiv.classList.add("modal");
+  firstDiv.classList.add("fade");
+  firstDiv.setAttribute("id", id);
+  firstDiv.setAttribute("tabindex", "-1");
+  firstDiv.setAttribute("aria-labelledby", "exampleModalLabel");
+  firstDiv.setAttribute("aria-hidden", "true");
 
+  const secDiv = document.createElement("div");
+  secDiv.classList.add("modal-dialog");
+  firstDiv.appendChild(secDiv);
 
+  const thirdDiv = document.createElement("div");
+  thirdDiv.classList.add("modal-content");
+  secDiv.appendChild(thirdDiv);
+
+  const fourthDiv = document.createElement("div");
+  fourthDiv.classList.add("modal-header");
+  thirdDiv.appendChild(fourthDiv);
+
+  const h5Heading = document.createElement("h5");
+  h5Heading.classList.add("modal-title");
+  h5Heading.classList.add("fs-5");
+  h5Heading.setAttribute("id", "exampleModalLabel");
+  console.log("title is", title);
+  // debugger;
+  h5Heading.textContent = title;
+  fourthDiv.appendChild(h5Heading);
+
+  const closeBtn = document.createElement("button");
+  closeBtn.setAttribute("type", "button");
+  closeBtn.classList.add("btn-close");
+  closeBtn.setAttribute("data-bs-dismiss", "modal");
+  closeBtn.setAttribute("aria-label", "Close");
+  fourthDiv.appendChild(closeBtn);
+
+  const url = urls;
+  const des = "Address:";
+  const add = vicinity;
+
+  const cardDiv = CardDivCreator(url, des, add);
+  thirdDiv.appendChild(cardDiv);
+
+  const footerDiv = document.createElement("div");
+  footerDiv.classList.add("modal-footer");
+  thirdDiv.appendChild(footerDiv);
+
+  const footerBtn = document.createElement("button");
+  footerBtn.setAttribute("type", "button");
+  addClassName(footerBtn, "btn");
+  addClassName(footerBtn, "btn-secondary");
+  footerBtn.setAttribute("data-bs-dismiss", "modal");
+  footerBtn.textContent = "Close";
+  footerDiv.appendChild(footerBtn);
+
+  return firstDiv;
+}
+
+async function getImg(id) {
+  const attractionDetailsApi = `${openTripBaseURL}xid/${id}?apikey=${opentripApiKey}`;
+  // debugger;
+  const res = await getAttractionDetail(attractionDetailsApi);
+  let url;
+
+  if (res.data.hasOwnProperty("preview")) {
+    url = res.data.preview.source;
+  } else {
+    // go to unsplash api to get a photo
+    url =
+      "https://www.adobe.com/content/dam/cc/us/en/creativecloud/file-types/image/raster/jpeg-file/OG-1200x800-jpeg.jpg";
+  }
+  return url;
+}
+
+async function getDescription(id) {
+  const attractionDetailsApi = `${openTripBaseURL}xid/${id}?apikey=${opentripApiKey}`;
+  const res = await getAttractionDetail(attractionDetailsApi);
+  let des;
+
+  if (res.data.hasOwnProperty("wikipedia_extracts")) {
+    des = res.data.wikipedia_extracts.text;
+  } else {
+    des = "some text";
+  }
+  return des;
+}
+
+function addClassName(ele, className) {
+  return ele.classList.add(className);
+}
+
+function CardDivCreator(imgUrl, description, address) {
+  const cardDiv = document.createElement("div");
+  addClassName(cardDiv, "card");
+
+  const image = document.createElement("img");
+  addClassName(image, "card-img-top");
+  image.setAttribute("src", imgUrl);
+  image.setAttribute("height", "300px");
+  image.setAttribute("width", "200px");
+  cardDiv.appendChild(image);
+
+  const list = document.createElement("ul");
+  addClassName(list, "list-group");
+  addClassName(list, "list-group-flush");
+  cardDiv.appendChild(list);
+
+  const listItem1 = document.createElement("li");
+  addClassName(listItem1, "list-group-item");
+  listItem1.textContent = description;
+  list.appendChild(listItem1);
+
+  const listItem2 = document.createElement("li");
+  addClassName(listItem2, "list-group-item");
+  listItem2.textContent = address;
+  list.appendChild(listItem2);
+
+  return cardDiv;
+}
