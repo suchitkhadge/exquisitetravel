@@ -37,7 +37,8 @@ myForm.addEventListener("submit", async (e) => {
   mapBtn.addEventListener("click", getGoogleMap);
   weatherBtn.addEventListener("click", showWeather);
 });
-
+// favorite button event handler
+favoriteBtn.addEventListener("click", showBookMark);
 // generate weather
 function showWeather() {
   fetch(
@@ -64,7 +65,8 @@ async function showRestaurantList() {
   fetch(API_URL)
     .then((res) => res.json())
     .then(async ({ results: restaurantList }) => {
-      for (const restaurant of restaurantList) {
+      const newRestaurantList = restaurantList.slice(0, 10);
+      for (const restaurant of newRestaurantList) {
         const listEle2 = document.createElement("li");
         listEle2.textContent = restaurant.name;
         list2.appendChild(listEle2);
@@ -148,9 +150,6 @@ async function callOpenTripApiToGetAttractionsList(api) {
     console.log(err);
   }
 }
-
-// favorite button enent handler
-favoriteBtn.addEventListener("click", showBookMark);
 
 // make api call to get details of attraction
 async function getAttractionDetail(api) {
