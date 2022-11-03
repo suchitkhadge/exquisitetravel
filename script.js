@@ -1,6 +1,8 @@
 const openTripBaseURL = "https://api.opentripmap.com/0.1/en/places/";
 const BaseURLGoogle = "https://maps.googleapis.com/maps/api/staticmap?";
 const googleMapApiKey = "AIzaSyC4qkDl4YCkSCxSe1xwLOxSa5T2W8QWyFc";
+const openWeatherBaseURL = "https://api.openweathermap.org/data/3.0/onecall?";
+const openWeatherApiKey = "bee1ae44576d679f5012d45660e1473a";
 
 const opentripApiKey =
   "5ae2e3f221c38a28845f05b697184d3cd9ee672b578170059a3aa7e6";
@@ -27,8 +29,20 @@ myForm.addEventListener("submit", async (e) => {
   const openTripAPI = `${openTripBaseURL}geoname?&name=${city}&apikey=${opentripApiKey}`;
   geo = await callOpenTripApiToGetGeo(openTripAPI);
   getGoogleMap(city);
-  attractionBtn.addEventListener("click", showAttractionsList);
-});
+  attractionBtn.addEventListener("click", showAttractionsList)
+  
+  weatherBtn.addEventListener("click",showWeather);
+})
+
+
+function showWeather() {
+  fetch(`${openWeatherBaseURL}lat=${geo[0]}&lon=${geo[1]}&appid=${openWeatherApiKey}`)
+  .then(response => response.json())
+  .then(data => console.log(data))
+  
+  .catch(err => alert("City not found!"))
+  
+}
 
 function showAttractionsList() {
   const att = city.slice(0, 3);
@@ -257,3 +271,4 @@ function getGoogleMap(city) {
 
   document.getElementById("main-container").appendChild(cityMap);
 }
+
