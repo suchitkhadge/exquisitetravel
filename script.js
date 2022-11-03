@@ -11,10 +11,14 @@ const limit = 10;
 let city;
 
 async function callOpenTripApiToGetGeo(api) {
-  const response = await axios.get(api);
-  const lat = response.data.lat;
-  const lon = response.data.lon;
-  return [lat, lon];
+  try {
+    const response = await axios.get(api);
+    const lat = response.data.lat;
+    const lon = response.data.lon;
+    return [lat, lon];
+  } catch (err) {
+    alert(err);
+  }
 }
 
 myForm.addEventListener("submit", async (e) => {
@@ -36,26 +40,30 @@ function showAttractionsList() {
 }
 
 async function callOpenTripApiToGetAttractionsList(api) {
-  const list = document.createElement("ul");
-  const main_container = document.querySelector("#main-container");
-  main_container.innerHTML = "";
-  main_container.appendChild(list);
-  //   debugger;
-  console.log(geo[0]);
-  const response = await axios.get(api);
-  const data = response.data.features;
-  console.log(data);
-  for (const attraction of data) {
-    // debugger;
-    const listEle = document.createElement("li");
-    const attractionName = attraction.properties.name;
-    listEle.textContent = attractionName;
-    list.appendChild(listEle);
-    const id = attraction.properties.xid;
-    const btn = detailsBtnCreator(id);
-    listEle.appendChild(btn);
-    const modal = await modalCreator(id, attractionName);
-    listEle.appendChild(modal);
+  try {
+    const list = document.createElement("ul");
+    const main_container = document.querySelector("#main-container");
+    main_container.innerHTML = "";
+    main_container.appendChild(list);
+    //   debugger;
+    console.log(geo[0]);
+    const response = await axios.get(api);
+    const data = response.data.features;
+    console.log(data);
+    for (const attraction of data) {
+      // debugger;
+      const listEle = document.createElement("li");
+      const attractionName = attraction.properties.name;
+      listEle.textContent = attractionName;
+      list.appendChild(listEle);
+      const id = attraction.properties.xid;
+      const btn = detailsBtnCreator(id);
+      listEle.appendChild(btn);
+      const modal = await modalCreator(id, attractionName);
+      listEle.appendChild(modal);
+    }
+  } catch (err) {
+    alert(err);
   }
 }
 
