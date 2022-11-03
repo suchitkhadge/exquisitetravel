@@ -1,5 +1,6 @@
-h6 {
-  padding-top: 20px;
-  padding-left: 15px;
-  font-weight: bolder;
+#googleMap{
+    border: 5px solid rgb(207, 203, 203);
+    padding: 15px;
+    display: flex;
+    
 }
