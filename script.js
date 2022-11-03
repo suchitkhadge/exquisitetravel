@@ -23,16 +23,16 @@ async function callOpenTripApiToGetGeo(api) {
   }
 }
 
-myForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  city = user_input.value;
-  const openTripAPI = `${openTripBaseURL}geoname?&name=${city}&apikey=${opentripApiKey}`;
-  geo = await callOpenTripApiToGetGeo(openTripAPI);
-  getGoogleMap(city);
-  attractionBtn.addEventListener("click", showAttractionsList)
+// myForm.addEventListener("submit", async (e) => {
+//   e.preventDefault();
+//   city = user_input.value;
+//   const openTripAPI = `${openTripBaseURL}geoname?&name=${city}&apikey=${opentripApiKey}`;
+//   geo = await callOpenTripApiToGetGeo(openTripAPI);
+//   getGoogleMap(city);
+//   attractionBtn.addEventListener("click", showAttractionsList)
   
-  weatherBtn.addEventListener("click",showWeather);
-})
+//   weatherBtn.addEventListener("click",showWeather);
+// })
 
 
 function showWeather() {
