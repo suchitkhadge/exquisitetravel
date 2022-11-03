@@ -6,12 +6,19 @@ const googleMapApiKey = "AIzaSyC4qkDl4YCkSCxSe1xwLOxSa5T2W8QWyFc";
 const openWeatherBaseURL = "https://api.openweathermap.org/data/3.0/onecall?";
 const openWeatherApiKey = "bee1ae44576d679f5012d45660e1473a";
 
+// to store geo location
 let geo = [];
-const radius = 20000;
-const rate = 2;
+const radius = 10000;
+const rate = 3;
 const limit = 10;
 let city;
 
+// helper function
+function addClassName(ele, className) {
+  return ele.classList.add(className);
+}
+
+// convert city name to geo location
 async function callOpenTripApiToGetGeo(api) {
   const response = await axios.get(api);
   const lat = response.data.lat;
@@ -27,11 +34,12 @@ myForm.addEventListener("submit", async (e) => {
   getGoogleMap(city);
   attractionBtn.addEventListener("click", showAttractionsList);
   restaurantsBtn.addEventListener("click", showRestaurantList);
-  mapBtn.addEventListener("click", getGoogleMap(city));
+  mapBtn.addEventListener("click", getGoogleMap);
   weatherBtn.addEventListener("click",showWeather);
+  favoriteBtn.addEventListener("click", showBookMark);
 });
-console.log(city);
 
+// generate weather
 function showWeather() {
   fetch(`${openWeatherBaseURL}lat=${geo[0]}&lon=${geo[1]}&appid=${openWeatherApiKey}`)
   .then(response => response.json())
@@ -41,9 +49,10 @@ function showWeather() {
   
 }
 
+// generate attractions list
 function showAttractionsList() {
   const att = city.slice(0, 3);
-  const attractionsAPi = `${openTripBaseURL}radius?radius=${radius}&lon=${geo[1]}&lat=${geo[0]}&limit=${limit}&apikey=${opentripApiKey}`;
+  const attractionsAPi = `${openTripBaseURL}radius?radius=${radius}&lon=${geo[1]}&lat=${geo[0]}&src_attr=wikidata&kinds=amusements%2Cinteresting_places&rate=${rate}&apikey=${opentripApiKey}&limit=${limit}&SameSite=None`;
   callOpenTripApiToGetAttractionsList(attractionsAPi);
 }
 
@@ -109,55 +118,65 @@ function getGoogleMap(city) {
   document.getElementById("main-container").appendChild(cityMap);
 }
 
-
+// make api call to get attractions data back
 async function callOpenTripApiToGetAttractionsList(api) {
-  const list = document.createElement("ul");
-  const main_container = document.querySelector("#main-container");
-  main_container.innerHTML = "";
-  main_container.appendChild(list);
-  //   debugger;
-  console.log(geo[0]);
-  const response = await axios.get(api);
-  const data = response.data.features;
-  console.log(data);
-  for (const attraction of data) {
-    // debugger;
-    const listEle = document.createElement("li");
-    const attractionName = attraction.properties.name;
-    listEle.textContent = attractionName;
-    list.appendChild(listEle);
-    const id = attraction.properties.xid;
-    const btn = detailsBtnCreator(id);
-    listEle.appendChild(btn);
-    const modal = await modalCreator(id, attractionName);
-    listEle.appendChild(modal);
+  try {
+    const list = document.createElement("ul");
+    const main_container = document.querySelector("#main-container");
+    main_container.innerHTML = "";
+    main_container.appendChild(list);
+
+    const response = await axios.get(api);
+    const data = response.data.features;
+
+    for (const attraction of data) {
+      const listEle = document.createElement("li");
+      const attractionName = attraction.properties.name;
+      listEle.textContent = attractionName;
+      list.appendChild(listEle);
+      const id = attraction.properties.xid;
+      const btn = detailsBtnCreator(id);
+      listEle.appendChild(btn);
+      const modal = await modalCreator(id, attractionName, 0);
+      listEle.appendChild(modal);
+    }
+  } catch (err) {
+    console.log(err);
   }
 }
 
+// make api call to get details of attraction
 async function getAttractionDetail(api) {
-  const res = await axios.get(api);
-  return res;
+  try {
+    const res = await axios.get(api);
+    return res;
+  } catch (err) {
+    console.log(err);
+  }
 }
 
+// details button for attraction list
 function detailsBtnCreator(id) {
   const btn = document.createElement("button");
   btn.textContent = "Details";
   btn.setAttribute("type", "button");
-  btn.classList.add("btn");
-  btn.classList.add("btn-primary");
+  addClassName(btn, "btn");
+  addClassName(btn, "btn-primary");
   btn.setAttribute("data-bs-toggle", "modal");
   btn.setAttribute("data-bs-target", `#${id}`);
   return btn;
 }
 
-async function modalCreator(id, title) {
-  const firstDiv = document.createElement("div");
-  firstDiv.classList.add("modal");
-  firstDiv.classList.add("fade");
-  firstDiv.setAttribute("id", id);
-  firstDiv.setAttribute("tabindex", "-1");
-  firstDiv.setAttribute("aria-labelledby", "exampleModalLabel");
-  firstDiv.setAttribute("aria-hidden", "true");
+// create pop-up modal for attraction
+async function modalCreator(id, title, disabled) {
+  try {
+    const firstDiv = document.createElement("div");
+    addClassName(firstDiv, "modal");
+    addClassName(firstDiv, "fade");
+    firstDiv.setAttribute("id", id);
+    firstDiv.setAttribute("tabindex", "-1");
+    firstDiv.setAttribute("aria-labelledby", "exampleModalLabel");
+    firstDiv.setAttribute("aria-hidden", "true");
 
   const secDiv = document.createElement("div");
   secDiv.classList.add("modal-dialog");
@@ -167,48 +186,122 @@ async function modalCreator(id, title) {
   thirdDiv.classList.add("modal-content");
   secDiv.appendChild(thirdDiv);
 
-  const fourthDiv = document.createElement("div");
-  fourthDiv.classList.add("modal-header");
-  thirdDiv.appendChild(fourthDiv);
+    const fourthDiv = document.createElement("div");
+    addClassName(fourthDiv, "modal-header");
+    thirdDiv.appendChild(fourthDiv);
 
   const h5Heading = document.createElement("h5");
   h5Heading.classList.add("modal-title");
   h5Heading.classList.add("fs-5");
   h5Heading.setAttribute("id", "exampleModalLabel");
-  console.log("title is", title);
-  // debugger;
   h5Heading.textContent = title;
   fourthDiv.appendChild(h5Heading);
+  
+    const closeBtn = document.createElement("button");
+    closeBtn.setAttribute("type", "button");
+    addClassName(closeBtn, "btn-close");
+    closeBtn.setAttribute("data-bs-dismiss", "modal");
+    closeBtn.setAttribute("aria-label", "Close");
+    fourthDiv.appendChild(closeBtn);
 
-  const closeBtn = document.createElement("button");
-  closeBtn.setAttribute("type", "button");
-  closeBtn.classList.add("btn-close");
-  closeBtn.setAttribute("data-bs-dismiss", "modal");
-  closeBtn.setAttribute("aria-label", "Close");
-  fourthDiv.appendChild(closeBtn);
-
-  const url = await getImg(id);
-  const des = await getDescription(id);
-  const add = "3342,seattle";
-
-  const cardDiv = CardDivCreator(url, des, add);
+  const result = await getImgDescriptionAddressAndWikiLink(id);
+  const url = result[0];
+  const des = result[1];
+  const add = result[2];
+  const wiki = result[3];
+  const cardDiv = CardDivCreator(url, des, add, wiki);
   thirdDiv.appendChild(cardDiv);
 
-  const footerDiv = document.createElement("div");
-  footerDiv.classList.add("modal-footer");
-  thirdDiv.appendChild(footerDiv);
+    const footerDiv = document.createElement("div");
+    addClassName(footerDiv, "modal-footer");
+    thirdDiv.appendChild(footerDiv);
 
-  const footerBtn = document.createElement("button");
-  footerBtn.setAttribute("type", "button");
-  addClassName(footerBtn, "btn");
-  addClassName(footerBtn, "btn-secondary");
-  footerBtn.setAttribute("data-bs-dismiss", "modal");
-  footerBtn.textContent = "Close";
-  footerDiv.appendChild(footerBtn);
+    const footerBtn = document.createElement("button");
+    footerBtn.setAttribute("type", "button");
+    addClassName(footerBtn, "btn");
+    addClassName(footerBtn, "btn-secondary");
+    footerBtn.setAttribute("data-bs-dismiss", "modal");
+    footerBtn.textContent = "Close";
+    footerDiv.appendChild(footerBtn);
 
-  return firstDiv;
+    const footerSaveBtn = document.createElement("button");
+    footerSaveBtn.setAttribute("type", "button");
+    footerSaveBtn.setAttribute("id", "saveBtn");
+
+    if (disabled === -1) {
+      footerSaveBtn.setAttribute("disabled", "true");
+    }
+
+    addClassName(footerSaveBtn, "btn");
+    addClassName(footerSaveBtn, "btn-primary");
+    footerSaveBtn.textContent = "Save";
+    footerDiv.appendChild(footerSaveBtn);
+
+    footerSaveBtn.addEventListener("click", () => {
+      const bookmark = {
+        city: city,
+        name: title,
+        location: add,
+        id: id,
+      };
+      localStorage.setItem(title, JSON.stringify(bookmark));
+      alert("You just saved this place!");
+    });
+
+    return firstDiv;
+  } catch (err) {
+    console.log(err);
+  }
 }
 
+// to retrieve saved items
+async function showBookMark() {
+  const list = document.createElement("ul");
+  const main_container = document.querySelector("#main-container");
+  main_container.innerHTML = "";
+  main_container.appendChild(list);
+
+  for (var i = 0; i < localStorage.length; i++) {
+    const listEle = document.createElement("li");
+    const attractionName = JSON.parse(
+      localStorage.getItem(localStorage.key(i))
+    ).name;
+    console.log(attractionName);
+    listEle.textContent = attractionName;
+    list.appendChild(listEle);
+    const id = JSON.parse(localStorage.getItem(localStorage.key(i))).id;
+    const btn = detailsBtnCreator(id);
+    listEle.appendChild(btn);
+    const modal = await modalCreator(id, attractionName, -1);
+    listEle.appendChild(modal);
+  }
+}
+
+// call api to get data for the modal
+async function getImgDescriptionAddressAndWikiLink(id) {
+  try {
+    const attractionDetailsApi = `${openTripBaseURL}xid/${id}?apikey=${opentripApiKey}`;
+    const res = await getAttractionDetail(attractionDetailsApi);
+    let url;
+    let description;
+    if (res.data.hasOwnProperty("preview")) {
+      url = res.data.preview.source;
+    } else {
+      url = "https://source.unsplash.com/random";
+    }
+    if (res.data.hasOwnProperty("wikipedia_extracts")) {
+      description = res.data.wikipedia_extracts.text;
+    } else {
+      description = `The kinds of this place is: ${res.data.kinds}. Congratulations you find a secret place and we don't have more information about here.`;
+    }
+    const addressObj = res.data.address;
+    const address = `${addressObj.house_number} ${addressObj.road}, ${addressObj.city}, ${addressObj.state} ${addressObj.postcode}`;
+    const wikiLink = res.data.wikipedia;
+    return [url, description, address, wikiLink];
+  } catch (err) {
+    console.log(err);
+  }
+}
 
 
 async function modalCreator3(id, title, urls, vicinity) {
@@ -271,42 +364,11 @@ async function modalCreator3(id, title, urls, vicinity) {
   return firstDiv;
 }
 
-async function getImg(id) {
-  const attractionDetailsApi = `${openTripBaseURL}xid/${id}?apikey=${opentripApiKey}`;
-  // debugger;
-  const res = await getAttractionDetail(attractionDetailsApi);
-  let url;
-
-  if (res.data.hasOwnProperty("preview")) {
-    url = res.data.preview.source;
-  } else {
-    // go to unsplash api to get a photo
-    url =
-      "https://www.adobe.com/content/dam/cc/us/en/creativecloud/file-types/image/raster/jpeg-file/OG-1200x800-jpeg.jpg";
-  }
-  return url;
-}
-
-async function getDescription(id) {
-  const attractionDetailsApi = `${openTripBaseURL}xid/${id}?apikey=${opentripApiKey}`;
-  const res = await getAttractionDetail(attractionDetailsApi);
-  let des;
-
-  if (res.data.hasOwnProperty("wikipedia_extracts")) {
-    des = res.data.wikipedia_extracts.text;
-  } else {
-    des = "some text";
-  }
-  return des;
-}
-
-function addClassName(ele, className) {
-  return ele.classList.add(className);
-}
-
-function CardDivCreator(imgUrl, description, address) {
+// create card of modal
+function CardDivCreator(imgUrl, description, address, wiki) {
   const cardDiv = document.createElement("div");
   addClassName(cardDiv, "card");
+  addClassName(cardDiv, "text-center");
 
   const image = document.createElement("img");
   addClassName(image, "card-img-top");
@@ -315,20 +377,36 @@ function CardDivCreator(imgUrl, description, address) {
   image.setAttribute("width", "200px");
   cardDiv.appendChild(image);
 
+  const cardBodyDiv = document.createElement("div");
+  addClassName(cardBodyDiv, "card-body");
+  cardDiv.appendChild(cardBodyDiv);
+
   const list = document.createElement("ul");
   addClassName(list, "list-group");
   addClassName(list, "list-group-flush");
-  cardDiv.appendChild(list);
+  cardBodyDiv.appendChild(list);
 
   const listItem1 = document.createElement("li");
   addClassName(listItem1, "list-group-item");
   listItem1.textContent = description;
   list.appendChild(listItem1);
 
+  const h6Heading = document.createElement("h6");
+  h6Heading.textContent = "Address:";
+  list.appendChild(h6Heading);
+
   const listItem2 = document.createElement("li");
   addClassName(listItem2, "list-group-item");
   listItem2.textContent = address;
   list.appendChild(listItem2);
 
+  const wikiBtn = document.createElement("a");
+  wikiBtn.setAttribute("href", wiki);
+  wikiBtn.setAttribute("target", "_blank");
+  addClassName(wikiBtn, "btn");
+  addClassName(wikiBtn, "btn-primary");
+  wikiBtn.textContent = "Go Wikipedia";
+  cardBodyDiv.appendChild(wikiBtn);
+  
   return cardDiv;
 }
