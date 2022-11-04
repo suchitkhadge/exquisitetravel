@@ -37,6 +37,7 @@ myForm.addEventListener("submit", async (e) => {
   mapBtn.addEventListener("click", getGoogleMap);
   weatherBtn.addEventListener("click", showWeather);
 });
+
 // favorite button event handler
 favoriteBtn.addEventListener("click", showBookMark);
 // generate weather
@@ -71,18 +72,16 @@ async function showRestaurantList() {
         listEle2.textContent = restaurant.name;
         list2.appendChild(listEle2);
         const mapGoogleImg = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&height=400&photo_reference=${restaurant.photos[0].photo_reference}&key=AIzaSyC4qkDl4YCkSCxSe1xwLOxSa5T2W8QWyFc`;
-
-        const btn2 = detailsBtnCreator(restaurant.photos[0].photo_reference);
-        listEle2.appendChild(btn2);
         const type = restaurant.types.join();
-        // debugger
-        // console.log(mapGoogleImg);
-        // console.log(restaurant.photos[0].photo_reference);
-        // console.log(restaurant.vicinity);
+        const id = restaurant.place_id;
+        const name = restaurant.name;
+
+        const btn2 = detailsBtnCreator(id);
+        listEle2.appendChild(btn2);
 
         const modal2 = await modalCreator3(
-          restaurant.photos[0].photo_reference,
-          restaurant.name,
+          id,
+          name,
           mapGoogleImg,
           restaurant.vicinity,
           type,
@@ -286,17 +285,29 @@ async function showBookMark() {
   main_container.appendChild(list);
 
   for (var i = 0; i < localStorage.length; i++) {
+    console.log(localStorage.length);
     const listEle = document.createElement("li");
     const attractionName = JSON.parse(
       localStorage.getItem(localStorage.key(i))
     ).name;
-    console.log(attractionName);
+    // console.log(attractionName);
     listEle.textContent = attractionName;
     list.appendChild(listEle);
     const id = JSON.parse(localStorage.getItem(localStorage.key(i))).id;
     const btn = detailsBtnCreator(id);
     listEle.appendChild(btn);
-    const modal = await modalCreator(id, attractionName, -1, 0);
+    let modal;
+
+    if (
+      Object.keys(JSON.parse(localStorage.getItem(localStorage.key(i)))) < 5
+    ) {
+      modal = await modalCreator(id, attractionName, -1, 0);
+    } else {
+      const img = JSON.parse(localStorage.getItem(localStorage.key(i))).img;
+      const type = JSON.parse(localStorage.getItem(localStorage.key(i))).type;
+      modal = await modalCreator3(id, attractionName, img, type, -1, 0);
+    }
+
     listEle.appendChild(modal);
   }
 }
@@ -398,6 +409,8 @@ async function modalCreator3(
       name: title,
       location: add,
       id: id,
+      img: urls,
+      type: type,
     };
     localStorage.setItem(title, JSON.stringify(bookmark));
     alert("You just saved this place!");
