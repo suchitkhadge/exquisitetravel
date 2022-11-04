@@ -1,11 +1,11 @@
 #googleMap{
-    padding: 5px;
     display: flex;
     border-radius: 70px;
+    border: solid 5px;
     
 }
 body{
-    background-image:url("/travel.avif");
+    background-image:url("/travel.png");
     min-width: 100%;
     background-position: center;
     background-size: cover;
@@ -28,6 +28,7 @@ body{
     border-radius: 2px;
 }
 
+
 .attraction-style{
     color:aliceblue;
     font-style:normal;
@@ -39,13 +40,13 @@ body{
     padding: 5px;
     margin-bottom: 5px;
     font-weight: bold;
-    background-color: rgb(234, 167, 125);
+    background-color: rgb(2202, 105, 70, 0.796);
 }
 
 #myForm{
     display: flex;
     justify-content: center;
-    margin-top: 10%;;
+    margin-top: ;;
     
 }
 
@@ -54,6 +55,7 @@ body{
 }
 .list-group-item{
     background-color:rgba(223, 105, 62, 0.796);
+    margin: 5px;
 }
 .modal-header{
     background-color:rgba(223, 105, 62, 0.796);
@@ -80,22 +82,24 @@ font-size:larger;
 
 #submitBtn{
     border-radius: 10px;
+    font-weight: bold;
     }
 
 .btn-primary{
     margin: 5px;
-    background-color:rgba(202, 105, 70, 0.796);
+    background-color:rgb(143, 115, 115);
     border: solid;
-    border-color: rgb(228, 139, 75);
+    border-radius: 25px;
 
 }
 
 #header-style{
     display: flex;
     justify-content: center;
-    color: rgb(208, 86, 86);
-    font-weight: bold;
-   
+    color: rgb(30, 25, 25);
+    font-family: 'Island Moments', cursive;
+    font-size: 160px;
+    font-weight: bolder;
 }
 
 body, html {height: 100%}

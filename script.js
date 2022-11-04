@@ -95,6 +95,7 @@ function getGoogleMap() {
   cityMap.setAttribute("src", cityMapSrc);
   cityMap.setAttribute("width", "700px");
   cityMap.setAttribute("height", "500px");
+  cityMap.setAttribute("border", "5px");
   cityMap.setAttribute("id", "googleMap");
   document.getElementById("main-container").innerHTML = "";
   document.getElementById("main-container").appendChild(cityMap);
