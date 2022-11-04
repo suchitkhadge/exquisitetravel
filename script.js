@@ -74,16 +74,20 @@ async function showRestaurantList() {
 
         const btn2 = detailsBtnCreator(restaurant.photos[0].photo_reference);
         listEle2.appendChild(btn2);
+        const type = restaurant.types.join();
         // debugger
         // console.log(mapGoogleImg);
-        console.log(restaurant.photos[0].photo_reference);
-        console.log(restaurant.vicinity);
+        // console.log(restaurant.photos[0].photo_reference);
+        // console.log(restaurant.vicinity);
 
         const modal2 = await modalCreator3(
           restaurant.photos[0].photo_reference,
           restaurant.name,
           mapGoogleImg,
-          restaurant.vicinity
+          restaurant.vicinity,
+          type,
+          0,
+          -1
         );
         listEle2.appendChild(modal2);
       }
@@ -231,17 +235,7 @@ async function modalCreator(id, title, disabledAdd, disabledDelete) {
     footerDiv.appendChild(footerBtn);
 
     const footerSaveBtn = saveOrDeleteBtn("saveBtn", "Save", disabledAdd);
-    // const footerSaveBtn = document.createElement("button");
-    // footerSaveBtn.setAttribute("type", "button");
-    // footerSaveBtn.setAttribute("id", "saveBtn");
-    // if (disabledAdd === -1) {
-    //   footerSaveBtn.setAttribute("disabled", "true");
-    // }
-    // addClassName(footerSaveBtn, "btn");
-    // addClassName(footerSaveBtn, "btn-primary");
-    // footerSaveBtn.textContent = "Save";
     footerDiv.appendChild(footerSaveBtn);
-
     footerSaveBtn.addEventListener("click", () => {
       const bookmark = {
         city: city,
@@ -258,19 +252,7 @@ async function modalCreator(id, title, disabledAdd, disabledDelete) {
       "Delete",
       disabledDelete
     );
-
-    // const footerDeleteBtn = document.createElement("button");
-    // footerDeleteBtn.setAttribute("type", "button");
-    // footerDeleteBtn.setAttribute("id", "deleteBtn");
-    // if (disabledDelete === -1) {
-    //   footerDeleteBtn.setAttribute("disabled", "true");
-    // }
-
-    // addClassName(footerDeleteBtn, "btn");
-    // addClassName(footerDeleteBtn, "btn-primary");
-    // footerDeleteBtn.textContent = "Delete";
     footerDiv.appendChild(footerDeleteBtn);
-
     footerDeleteBtn.addEventListener("click", () => {
       localStorage.removeItem(title);
       alert("You just deleted this item");
@@ -295,17 +277,6 @@ function saveOrDeleteBtn(btnId, btnName, disabled) {
   Btn.textContent = btnName;
   return Btn;
 }
-// save data to localStorage
-// function saveItem(city, title, add, id) {
-//   const bookmark = {
-//     city: city,
-//     name: title,
-//     location: add,
-//     id: id,
-//   };
-//   localStorage.setItem(title, JSON.stringify(bookmark));
-//   alert("You just saved this place!");
-// }
 
 // to retrieve saved items
 async function showBookMark() {
@@ -356,7 +327,15 @@ async function getImgDescriptionAddressAndWikiLink(id) {
   }
 }
 
-async function modalCreator3(id, title, urls, vicinity) {
+async function modalCreator3(
+  id,
+  title,
+  urls,
+  vicinity,
+  type,
+  disabledAdd,
+  disabledDelete
+) {
   const firstDiv = document.createElement("div");
   firstDiv.classList.add("modal");
   firstDiv.classList.add("fade");
@@ -382,7 +361,6 @@ async function modalCreator3(id, title, urls, vicinity) {
   h5Heading.classList.add("fs-5");
   h5Heading.setAttribute("id", "exampleModalLabel");
   console.log("title is", title);
-  // debugger;
   h5Heading.textContent = title;
   fourthDiv.appendChild(h5Heading);
 
@@ -394,10 +372,10 @@ async function modalCreator3(id, title, urls, vicinity) {
   fourthDiv.appendChild(closeBtn);
 
   const url = urls;
-  const des = "Address:";
+  const des = `Type of this restaurant: ${type}`;
   const add = vicinity;
 
-  const cardDiv = CardDivCreator(url, des, add);
+  const cardDiv = CardDivCreatorWithoutWiki(url, des, add);
   thirdDiv.appendChild(cardDiv);
 
   const footerDiv = document.createElement("div");
@@ -411,6 +389,31 @@ async function modalCreator3(id, title, urls, vicinity) {
   footerBtn.setAttribute("data-bs-dismiss", "modal");
   footerBtn.textContent = "Close";
   footerDiv.appendChild(footerBtn);
+  // add buttons
+  const footerSaveBtn = saveOrDeleteBtn("saveBtn", "Save", disabledAdd);
+  footerDiv.appendChild(footerSaveBtn);
+  footerSaveBtn.addEventListener("click", () => {
+    const bookmark = {
+      city: city,
+      name: title,
+      location: add,
+      id: id,
+    };
+    localStorage.setItem(title, JSON.stringify(bookmark));
+    alert("You just saved this place!");
+  });
+
+  const footerDeleteBtn = saveOrDeleteBtn(
+    "deleteBtn",
+    "Delete",
+    disabledDelete
+  );
+  footerDiv.appendChild(footerDeleteBtn);
+  footerDeleteBtn.addEventListener("click", () => {
+    localStorage.removeItem(title);
+    alert("You just deleted this item");
+    location.reload();
+  });
 
   return firstDiv;
 }
@@ -458,6 +461,44 @@ function CardDivCreator(imgUrl, description, address, wiki) {
   addClassName(wikiBtn, "btn-primary");
   wikiBtn.textContent = "Go Wikipedia";
   cardBodyDiv.appendChild(wikiBtn);
+
+  return cardDiv;
+}
+
+function CardDivCreatorWithoutWiki(imgUrl, description, address) {
+  const cardDiv = document.createElement("div");
+  addClassName(cardDiv, "card");
+  addClassName(cardDiv, "text-center");
+
+  const image = document.createElement("img");
+  addClassName(image, "card-img-top");
+  image.setAttribute("src", imgUrl);
+  image.setAttribute("height", "300px");
+  image.setAttribute("width", "200px");
+  cardDiv.appendChild(image);
+
+  const cardBodyDiv = document.createElement("div");
+  addClassName(cardBodyDiv, "card-body");
+  cardDiv.appendChild(cardBodyDiv);
+
+  const list = document.createElement("ul");
+  addClassName(list, "list-group");
+  addClassName(list, "list-group-flush");
+  cardBodyDiv.appendChild(list);
+
+  const listItem1 = document.createElement("li");
+  addClassName(listItem1, "list-group-item");
+  listItem1.textContent = description;
+  list.appendChild(listItem1);
+
+  const h6Heading = document.createElement("h6");
+  h6Heading.textContent = "Address:";
+  list.appendChild(h6Heading);
+
+  const listItem2 = document.createElement("li");
+  addClassName(listItem2, "list-group-item");
+  listItem2.textContent = address;
+  list.appendChild(listItem2);
 
   return cardDiv;
 }
