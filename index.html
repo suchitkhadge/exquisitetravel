@@ -24,39 +24,48 @@
     />
 
     <link rel="stylesheet" href="style.css" />
+    <h1 id ="header-style"> Exquisite Travel</h1>
   </head>
   <body>
-    
     <form id="myForm">
       <input
         type="text"
         name=""
         id="user_input"
-        placeholder="Type your dream city"
+        placeholder="  Type your dream city"
       /><br />
-      <input type="submit" value="Submit" />
+      <input type="submit" value="Submit" id = "submitBtn" />
     </form>
 
-    <section id="button-container">
-      <button id = "weatherBtn">Weather</button>
-      <button id = "attractionBtn">Attractions</button>
-      <button id = "restaurantsBtn">Restaurants</button>
-      <button id = "mapBtn">Map</button>
-      <button id="favoriteBtn">Favorite</button>
+    <section id="button-container" >
+      <button id="weatherBtn"class="btn btn-warning">Weather</button>
+      <button id="attractionBtn"class="btn btn-warning">Attractions</button>
+      <button id="restaurantsBtn"class="btn btn-warning">Restaurants</button>
+      <button id="mapBtn"class="btn btn-warning">Map</button>
+      <button id="favoriteBtn"class="btn btn-warning">Favourite</button>
     </section>
     <div id="content"></div>
 
     <section id="main-container">
       <!-- display area is here -->
     </section>
-    <p></p>
-
-     
-   
+  
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+      !(function (d, s, id) {
+        var js,
+          fjs = d.getElementsByTagName(s)[0];
+        if (!d.getElementById(id)) {
+          js = d.createElement(s);
+          js.id = id;
+          js.src = "https://weatherwidget.io/js/widget.min.js";
+          fjs.parentNode.insertBefore(js, fjs);
+        }
+      })(document, "script", "weatherwidget-io-js");
+    </script>
     <script
       src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
       integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
@@ -82,7 +91,7 @@
       integrity="sha384-IDwe1+LCz02ROU9k972gdyvl+AESN10+x7tBKgc9I5HFtuNz0wWnPclzo6p9vxnk"
       crossorigin="anonymous"
     ></script>
-
     <script src="script.js"></script>
+   
   </body>
 </html>
