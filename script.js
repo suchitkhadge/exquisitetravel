@@ -8,7 +8,7 @@ const openWeatherApiKey = "bee1ae44576d679f5012d45660e1473a";
 
 // to store geo location
 let geo = [];
-const radius = 10000;
+const radius = 80000;
 const rate = 3;
 const limit = 10;
 let city;
@@ -35,26 +35,16 @@ myForm.addEventListener("submit", async (e) => {
   attractionBtn.addEventListener("click", showAttractionsList);
   restaurantsBtn.addEventListener("click", showRestaurantList);
   mapBtn.addEventListener("click", getGoogleMap);
-  weatherBtn.addEventListener("click", showWeather);
+  // weatherBtn.addEventListener("click", showWeather);
 });
 
 // favorite button event handler
 favoriteBtn.addEventListener("click", showBookMark);
-// generate weather
-function showWeather() {
-  fetch(
-    `${openWeatherBaseURL}lat=${geo[0]}&lon=${geo[1]}&appid=${openWeatherApiKey}`
-  )
-    .then((response) => response.json())
-    .then((data) => console.log(data))
-
-    .catch((err) => alert("City not found!"));
-}
 
 // generate attractions list
 function showAttractionsList() {
   const att = city.slice(0, 3);
-  const attractionsAPi = `${openTripBaseURL}radius?radius=${radius}&lon=${geo[1]}&lat=${geo[0]}&src_attr=wikidata&kinds=amusements%2Cinteresting_places&rate=${rate}&apikey=${opentripApiKey}&limit=${limit}&SameSite=None`;
+  const attractionsAPi = `${openTripBaseURL}radius?radius=${radius}&lon=${geo[1]}&lat=${geo[0]}&kinds=amusements%2Cinteresting_places&rate=${rate}&apikey=${opentripApiKey}&limit=${limit}&SameSite=None`;
   callOpenTripApiToGetAttractionsList(attractionsAPi);
 }
 // generate restaurants list
@@ -69,6 +59,7 @@ async function showRestaurantList() {
       const newRestaurantList = restaurantList.slice(0, 10);
       for (const restaurant of newRestaurantList) {
         const listEle2 = document.createElement("li");
+        listEle2.setAttribute("class", "attraction-style");
         listEle2.textContent = restaurant.name;
         list2.appendChild(listEle2);
         const mapGoogleImg = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&height=400&photo_reference=${restaurant.photos[0].photo_reference}&key=AIzaSyC4qkDl4YCkSCxSe1xwLOxSa5T2W8QWyFc`;
@@ -94,12 +85,12 @@ async function showRestaurantList() {
     });
 }
 
-function getGoogleMap(city) {
+function getGoogleMap() {
   let cityMap = document.createElement("img");
   let cityMapSrc = `${BaseURLGoogle}center=${city}&markers=color:blue%7Clabel:S%7C11211%7C11206%7C11222&zoom=8&size=500x500&key=${googleMapApiKey}`;
   cityMap.setAttribute("src", cityMapSrc);
-  cityMap.setAttribute("width", "400px");
-  cityMap.setAttribute("height", "400px");
+  cityMap.setAttribute("width", "700px");
+  cityMap.setAttribute("height", "500px");
   cityMap.setAttribute("id", "googleMap");
   document.getElementById("main-container").innerHTML = "";
   document.getElementById("main-container").appendChild(cityMap);
@@ -119,6 +110,7 @@ async function callOpenTripApiToGetAttractionsList(api) {
     for (const attraction of data) {
       const listEle = document.createElement("li");
       const attractionName = attraction.properties.name;
+      listEle.setAttribute("class", "attraction-style");
       listEle.textContent = attractionName;
       list.appendChild(listEle);
       const id = attraction.properties.xid;
@@ -258,12 +250,13 @@ function saveOrDeleteBtn(btnId, btnName, disabled) {
 // to retrieve saved items
 async function showBookMark() {
   const list = document.createElement("ul");
+  list.setAttribute("class", "attraction-style");
+
   const main_container = document.querySelector("#main-container");
   main_container.innerHTML = "";
   main_container.appendChild(list);
 
   for (var i = 0; i < localStorage.length; i++) {
-    console.log(localStorage.length);
     const listEle = document.createElement("li");
     const attractionName = JSON.parse(
       localStorage.getItem(localStorage.key(i))
@@ -278,7 +271,6 @@ async function showBookMark() {
     const objLength = Object.keys(
       JSON.parse(localStorage.getItem(localStorage.key(i)))
     );
-    console.log(objLength);
 
     if (objLength.length < 5) {
       modal = await modalCreator(id, attractionName, -1, 0);
@@ -311,6 +303,7 @@ async function getImgDescriptionAddressAndWikiLink(id) {
     const res = await getAttractionDetail(attractionDetailsApi);
     let url;
     let description;
+    let address;
     if (res.data.hasOwnProperty("preview")) {
       url = res.data.preview.source;
     } else {
@@ -321,8 +314,14 @@ async function getImgDescriptionAddressAndWikiLink(id) {
     } else {
       description = `The kinds of this place is: ${res.data.kinds}. Congratulations you find a secret place and we don't have more information about here.`;
     }
+
     const addressObj = res.data.address;
-    const address = `${addressObj.house_number} ${addressObj.road}, ${addressObj.city}, ${addressObj.state} ${addressObj.postcode}`;
+    if (addressObj.hasOwnProperty("house_number")) {
+      address = `${addressObj.house_number} ${addressObj.road}, ${addressObj.city}, ${addressObj.state} ${addressObj.postcode}`;
+    } else {
+      address =
+        "We don't have address information for this place but you can may more information in wikipedia.";
+    }
     const wikiLink = res.data.wikipedia;
     return [url, description, address, wikiLink];
   } catch (err) {
@@ -364,7 +363,7 @@ async function modalCreator3(
   h5Heading.classList.add("modal-title");
   h5Heading.classList.add("fs-5");
   h5Heading.setAttribute("id", "exampleModalLabel");
-  console.log("title is", title);
+
   h5Heading.textContent = title;
   fourthDiv.appendChild(h5Heading);
 
