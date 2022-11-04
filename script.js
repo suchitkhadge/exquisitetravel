@@ -35,26 +35,14 @@ myForm.addEventListener("submit", async (e) => {
   attractionBtn.addEventListener("click", showAttractionsList);
   restaurantsBtn.addEventListener("click", showRestaurantList);
   mapBtn.addEventListener("click", getGoogleMap);
-  weatherBtn.addEventListener("click",showWeather);
-  favoriteBtn.addEventListener("click", showBookMark);
+  // weatherBtn.addEventListener("click", showWeather);
 });
 
 
-function showWeather() {
-  fetch(`http://api.openweathermap.org/data/2.5/weather?lat=${geo[0]}&lon=${geo[1]}&appid=${openWeatherApiKey}`)
-        .then(function(response){
-            let data = response.json();
-            return data;
-        })
-        .then(function(data){
-            weather.temperature.value = Math.floor(data.main.temp - KELVIN);
-            weather.description = data.weather[0].description;
-            weather.iconId = data.weather[0].icon;
-            weather.city = data.name;
-            weather.country = data.sys.country;
-            console.log( weather.city);
-        });
-}
+
+// favorite button event handler
+favoriteBtn.addEventListener("click", showBookMark);
+
 
 
 // generate attractions list
@@ -63,8 +51,7 @@ function showAttractionsList() {
   const attractionsAPi = `${openTripBaseURL}radius?radius=${radius}&lon=${geo[1]}&lat=${geo[0]}&src_attr=wikidata&kinds=amusements%2Cinteresting_places&rate=${rate}&apikey=${opentripApiKey}&limit=${limit}&SameSite=None`;
   callOpenTripApiToGetAttractionsList(attractionsAPi);
 }
-
-
+// generate restaurants list
 async function showRestaurantList() {
   document.getElementById("main-container").innerHTML = " ";
   const list2 = document.createElement("ul");
@@ -73,38 +60,34 @@ async function showRestaurantList() {
   fetch(API_URL)
     .then((res) => res.json())
     .then(async ({ results: restaurantList }) => {
-      for (const restaurant of restaurantList) {
+      const newRestaurantList = restaurantList.slice(0, 10);
+      for (const restaurant of newRestaurantList) {
         const listEle2 = document.createElement("li");
         listEle2.setAttribute("class", "attraction-style");
         listEle2.textContent = restaurant.name;
         list2.appendChild(listEle2);
         const mapGoogleImg = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&height=400&photo_reference=${restaurant.photos[0].photo_reference}&key=AIzaSyC4qkDl4YCkSCxSe1xwLOxSa5T2W8QWyFc`;
+        const type = restaurant.types.join();
+        const id = restaurant.place_id;
+        const name = restaurant.name;
 
-        const btn2 = detailsBtnCreator(restaurant.photos[0].photo_reference);
+        const btn2 = detailsBtnCreator(id);
         listEle2.appendChild(btn2);
-        // debugger
-       // console.log(mapGoogleImg);
-        console.log(restaurant.photos[0].photo_reference);
-        console.log(restaurant.vicinity);
-  
-        const modal2 =  await modalCreator3(restaurant.photos[0].photo_reference, restaurant.name, mapGoogleImg, restaurant.vicinity);
+
+        const modal2 = await modalCreator3(
+          id,
+          name,
+          mapGoogleImg,
+          restaurant.vicinity,
+          type,
+          0,
+          -1
+        );
         listEle2.appendChild(modal2);
       }
       console.log(restaurantList);
     });
 }
-
-function detailsBtnCreator() {
-  const btn = document.createElement("button");
-  btn.textContent = "Details";
-  btn.setAttribute("type", "button");
-  btn.classList.add("btn");
-  btn.classList.add("btn-primary");
-  btn.setAttribute("data-bs-toggle", "modal");
-  btn.setAttribute("data-bs-target", "#exampleModal");
-  return btn;
-}
-
 
 function getGoogleMap() {
   let cityMap = document.createElement("img");
@@ -137,7 +120,7 @@ async function callOpenTripApiToGetAttractionsList(api) {
       const id = attraction.properties.xid;
       const btn = detailsBtnCreator(id);
       listEle.appendChild(btn);
-      const modal = await modalCreator(id, attractionName, 0);
+      const modal = await modalCreator(id, attractionName, 0, -1);
       listEle.appendChild(modal);
     }
   } catch (err) {
@@ -168,7 +151,7 @@ function detailsBtnCreator(id) {
 }
 
 // create pop-up modal for attraction
-async function modalCreator(id, title, disabled) {
+async function modalCreator(id, title, disabledAdd, disabledDelete) {
   try {
     const firstDiv = document.createElement("div");
     addClassName(firstDiv, "modal");
@@ -178,25 +161,25 @@ async function modalCreator(id, title, disabled) {
     firstDiv.setAttribute("aria-labelledby", "exampleModalLabel");
     firstDiv.setAttribute("aria-hidden", "true");
 
-  const secDiv = document.createElement("div");
-  secDiv.classList.add("modal-dialog");
-  firstDiv.appendChild(secDiv);
+    const secDiv = document.createElement("div");
+    secDiv.classList.add("modal-dialog");
+    firstDiv.appendChild(secDiv);
 
-  const thirdDiv = document.createElement("div");
-  thirdDiv.classList.add("modal-content");
-  secDiv.appendChild(thirdDiv);
+    const thirdDiv = document.createElement("div");
+    thirdDiv.classList.add("modal-content");
+    secDiv.appendChild(thirdDiv);
 
     const fourthDiv = document.createElement("div");
     addClassName(fourthDiv, "modal-header");
     thirdDiv.appendChild(fourthDiv);
 
-  const h5Heading = document.createElement("h5");
-  h5Heading.classList.add("modal-title");
-  h5Heading.classList.add("fs-5");
-  h5Heading.setAttribute("id", "exampleModalLabel");
-  h5Heading.textContent = title;
-  fourthDiv.appendChild(h5Heading);
-  
+    const h5Heading = document.createElement("h5");
+    h5Heading.classList.add("modal-title");
+    h5Heading.classList.add("fs-5");
+    h5Heading.setAttribute("id", "exampleModalLabel");
+    h5Heading.textContent = title;
+    fourthDiv.appendChild(h5Heading);
+
     const closeBtn = document.createElement("button");
     closeBtn.setAttribute("type", "button");
     addClassName(closeBtn, "btn-close");
@@ -204,13 +187,13 @@ async function modalCreator(id, title, disabled) {
     closeBtn.setAttribute("aria-label", "Close");
     fourthDiv.appendChild(closeBtn);
 
-  const result = await getImgDescriptionAddressAndWikiLink(id);
-  const url = result[0];
-  const des = result[1];
-  const add = result[2];
-  const wiki = result[3];
-  const cardDiv = CardDivCreator(url, des, add, wiki);
-  thirdDiv.appendChild(cardDiv);
+    const result = await getImgDescriptionAddressAndWikiLink(id);
+    const url = result[0];
+    const des = result[1];
+    const add = result[2];
+    const wiki = result[3];
+    const cardDiv = CardDivCreator(url, des, add, wiki);
+    thirdDiv.appendChild(cardDiv);
 
     const footerDiv = document.createElement("div");
     addClassName(footerDiv, "modal-footer");
@@ -224,19 +207,8 @@ async function modalCreator(id, title, disabled) {
     footerBtn.textContent = "Close";
     footerDiv.appendChild(footerBtn);
 
-    const footerSaveBtn = document.createElement("button");
-    footerSaveBtn.setAttribute("type", "button");
-    footerSaveBtn.setAttribute("id", "saveBtn");
-
-    if (disabled === -1) {
-      footerSaveBtn.setAttribute("disabled", "true");
-    }
-
-    addClassName(footerSaveBtn, "btn");
-    addClassName(footerSaveBtn, "btn-primary");
-    footerSaveBtn.textContent = "Save";
+    const footerSaveBtn = saveOrDeleteBtn("saveBtn", "Save", disabledAdd);
     footerDiv.appendChild(footerSaveBtn);
-
     footerSaveBtn.addEventListener("click", () => {
       const bookmark = {
         city: city,
@@ -248,10 +220,35 @@ async function modalCreator(id, title, disabled) {
       alert("You just saved this place!");
     });
 
+    const footerDeleteBtn = saveOrDeleteBtn(
+      "deleteBtn",
+      "Delete",
+      disabledDelete
+    );
+    footerDiv.appendChild(footerDeleteBtn);
+    footerDeleteBtn.addEventListener("click", () => {
+      localStorage.removeItem(title);
+      alert("You just deleted this item");
+      location.reload();
+    });
+
     return firstDiv;
   } catch (err) {
     console.log(err);
   }
+}
+// create save and delete buttons
+function saveOrDeleteBtn(btnId, btnName, disabled) {
+  const Btn = document.createElement("button");
+  Btn.setAttribute("type", "button");
+  Btn.setAttribute("id", btnId);
+  if (disabled === -1) {
+    Btn.setAttribute("disabled", "true");
+  }
+  addClassName(Btn, "btn");
+  addClassName(Btn, "btn-primary");
+  Btn.textContent = btnName;
+  return Btn;
 }
 
 // to retrieve saved items
@@ -264,17 +261,43 @@ async function showBookMark() {
   main_container.appendChild(list);
 
   for (var i = 0; i < localStorage.length; i++) {
+    console.log(localStorage.length);
     const listEle = document.createElement("li");
     const attractionName = JSON.parse(
       localStorage.getItem(localStorage.key(i))
     ).name;
-    console.log(attractionName);
+    // console.log(attractionName);
     listEle.textContent = attractionName;
     list.appendChild(listEle);
     const id = JSON.parse(localStorage.getItem(localStorage.key(i))).id;
     const btn = detailsBtnCreator(id);
     listEle.appendChild(btn);
-    const modal = await modalCreator(id, attractionName, -1);
+    let modal;
+    const objLength = Object.keys(
+      JSON.parse(localStorage.getItem(localStorage.key(i)))
+    );
+    console.log(objLength);
+
+    if (objLength.length < 5) {
+      modal = await modalCreator(id, attractionName, -1, 0);
+    } else {
+      const img = JSON.parse(localStorage.getItem(localStorage.key(i))).img;
+      console.log(img);
+      const type = JSON.parse(localStorage.getItem(localStorage.key(i))).type;
+      const address = JSON.parse(
+        localStorage.getItem(localStorage.key(i))
+      ).location;
+      modal = await modalCreator3(
+        id,
+        attractionName,
+        img,
+        address,
+        type,
+        -1,
+        0
+      );
+    }
+
     listEle.appendChild(modal);
   }
 }
@@ -305,9 +328,16 @@ async function getImgDescriptionAddressAndWikiLink(id) {
   }
 }
 
-
-async function modalCreator3(id, title, urls, vicinity) {
-  
+// create pop-up modal for restaurants
+async function modalCreator3(
+  id,
+  title,
+  urls,
+  vicinity,
+  type,
+  disabledAdd,
+  disabledDelete
+) {
   const firstDiv = document.createElement("div");
   firstDiv.classList.add("modal");
   firstDiv.classList.add("fade");
@@ -335,7 +365,6 @@ async function modalCreator3(id, title, urls, vicinity) {
   h5Heading.classList.add("fs-5");
   h5Heading.setAttribute("id", "exampleModalLabel");
   console.log("title is", title);
-  // debugger;
   h5Heading.textContent = title;
   fourthDiv.appendChild(h5Heading);
 
@@ -347,10 +376,10 @@ async function modalCreator3(id, title, urls, vicinity) {
   fourthDiv.appendChild(closeBtn);
 
   const url = urls;
-  const des = " ";
+  const des = type;
   const add = vicinity;
 
-  const cardDiv = CardDivCreator(url, des, add);
+  const cardDiv = CardDivCreatorWithoutWiki(url, des, add);
   thirdDiv.appendChild(cardDiv);
 
   const footerDiv = document.createElement("div");
@@ -364,6 +393,33 @@ async function modalCreator3(id, title, urls, vicinity) {
   footerBtn.setAttribute("data-bs-dismiss", "modal");
   footerBtn.textContent = "Close";
   footerDiv.appendChild(footerBtn);
+  // add buttons
+  const footerSaveBtn = saveOrDeleteBtn("saveBtn", "Save", disabledAdd);
+  footerDiv.appendChild(footerSaveBtn);
+  footerSaveBtn.addEventListener("click", () => {
+    const bookmark = {
+      city: city,
+      name: title,
+      location: add,
+      id: id,
+      img: urls,
+      type: type,
+    };
+    localStorage.setItem(title, JSON.stringify(bookmark));
+    alert("You just saved this place!");
+  });
+
+  const footerDeleteBtn = saveOrDeleteBtn(
+    "deleteBtn",
+    "Delete",
+    disabledDelete
+  );
+  footerDiv.appendChild(footerDeleteBtn);
+  footerDeleteBtn.addEventListener("click", () => {
+    localStorage.removeItem(title);
+    alert("You just deleted this item");
+    location.reload();
+  });
 
   return firstDiv;
 }
@@ -411,7 +467,45 @@ function CardDivCreator(imgUrl, description, address, wiki) {
   addClassName(wikiBtn, "btn-primary");
   wikiBtn.textContent = "Go Wikipedia";
   cardBodyDiv.appendChild(wikiBtn);
-  
+
+  return cardDiv;
+}
+
+function CardDivCreatorWithoutWiki(imgUrl, description, address) {
+  const cardDiv = document.createElement("div");
+  addClassName(cardDiv, "card");
+  addClassName(cardDiv, "text-center");
+
+  const image = document.createElement("img");
+  addClassName(image, "card-img-top");
+  image.setAttribute("src", imgUrl);
+  image.setAttribute("height", "300px");
+  image.setAttribute("width", "200px");
+  cardDiv.appendChild(image);
+
+  const cardBodyDiv = document.createElement("div");
+  addClassName(cardBodyDiv, "card-body");
+  cardDiv.appendChild(cardBodyDiv);
+
+  const list = document.createElement("ul");
+  addClassName(list, "list-group");
+  addClassName(list, "list-group-flush");
+  cardBodyDiv.appendChild(list);
+
+  const listItem1 = document.createElement("li");
+  addClassName(listItem1, "list-group-item");
+  listItem1.textContent = description;
+  list.appendChild(listItem1);
+
+  const h6Heading = document.createElement("h6");
+  h6Heading.textContent = "Address:";
+  list.appendChild(h6Heading);
+
+  const listItem2 = document.createElement("li");
+  addClassName(listItem2, "list-group-item");
+  listItem2.textContent = address;
+  list.appendChild(listItem2);
+
   return cardDiv;
 }
 
