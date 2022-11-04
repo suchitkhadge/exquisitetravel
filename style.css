@@ -4,6 +4,7 @@
   border-radius: 70px;
 }
 body {
+  /* padding-top: 200px; */
   background-image: url("/travel.avif");
   min-width: 100%;
   background-position: center;
