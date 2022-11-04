@@ -1,101 +1,98 @@
-#googleMap{
-    padding: 5px;
-    display: flex;
-    border-radius: 70px;
-    
+#googleMap {
+  padding: 5px;
+  display: flex;
+  border-radius: 70px;
 }
-body{
-    background-image:url("/travel.avif");
-    min-width: 100%;
-    background-position: center;
-    background-size: cover;
-    background-repeat: no-repeat;
-    font-family: "Sulphur Point",sans-serif;
-    font-weight: normal;
-    font-style: normal;
-}
-
-#main-container{
-    display:flex;
-    justify-content: center
-
+body {
+  /* padding-top: 200px; */
+  background-image: url("/travel.avif");
+  min-width: 100%;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  font-family: "Sulphur Point", sans-serif;
+  font-weight: normal;
+  font-style: normal;
 }
 
-
-#button-container{
-    display: flex;
-    justify-content: center;
-    border-radius: 2px;
+#main-container {
+  display: flex;
+  justify-content: center;
 }
 
-.attraction-style{
-    color:aliceblue;
-    font-style:normal;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: large;
-    border: solid;
-    border-width: 6px;
-    border-radius: 20px;
-    padding: 5px;
-    margin-bottom: 5px;
-    font-weight: bold;
-    background-color: rgb(234, 167, 125);
+#button-container {
+  display: flex;
+  justify-content: center;
+  border-radius: 2px;
 }
 
-#myForm{
-    display: flex;
-    justify-content: center;
-    margin-top: 10%;;
-    
+.attraction-style {
+  color: aliceblue;
+  font-style: normal;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: large;
+  border: solid;
+  border-width: 6px;
+  border-radius: 20px;
+  padding: 5px;
+  margin-bottom: 5px;
+  font-weight: bold;
+  background-color: rgb(234, 167, 125);
 }
 
-.card-body{
-    background-color:rgba(223, 105, 62, 0.796);
-}
-.list-group-item{
-    background-color:rgba(223, 105, 62, 0.796);
-}
-.modal-header{
-    background-color:rgba(223, 105, 62, 0.796);
-}
-.modal-footer{
-    background-color:rgba(223, 105, 62, 0.796);
-}
-#user_input{
-    width: 45%;
-    position: relative;
-    border-top-left-radius: 50px;
-    overflow: hidden;
-    border-bottom-left-radius: 50px;
-    border-top-right-radius: 50px;
-    border-bottom-right-radius: 50px;
-
+#myForm {
+  display: flex;
+  justify-content: center;
+  margin-top: 10%;
 }
 
-.btn-warning{
-margin: 10px;
-font-weight: bold;
-font-size:larger;
+.card-body {
+  background-color: rgba(223, 105, 62, 0.796);
+}
+.list-group-item {
+  background-color: rgba(223, 105, 62, 0.796);
+}
+.modal-header {
+  background-color: rgba(223, 105, 62, 0.796);
+}
+.modal-footer {
+  background-color: rgba(223, 105, 62, 0.796);
+}
+#user_input {
+  width: 45%;
+  position: relative;
+  border-top-left-radius: 50px;
+  overflow: hidden;
+  border-bottom-left-radius: 50px;
+  border-top-right-radius: 50px;
+  border-bottom-right-radius: 50px;
 }
 
-#submitBtn{
-    border-radius: 10px;
-    }
-
-.btn-primary{
-    margin: 5px;
-    background-color:rgba(202, 105, 70, 0.796);
-    border: solid;
-    border-color: rgb(228, 139, 75);
-
+.btn-warning {
+  margin: 10px;
+  font-weight: bold;
+  font-size: larger;
 }
 
-#header-style{
-    display: flex;
-    justify-content: center;
-    color: rgb(208, 86, 86);
-    font-weight: bold;
-   
+#submitBtn {
+  border-radius: 10px;
 }
 
-body, html {height: 100%}
+.btn-primary {
+  margin: 5px;
+  background-color: rgba(202, 105, 70, 0.796);
+  border: solid;
+  border-color: rgb(228, 139, 75);
+}
+
+#header-style {
+  display: flex;
+  justify-content: center;
+  color: rgb(208, 86, 86);
+  font-weight: bold;
+}
+
+body,
+html {
+  height: 100%;
+}
