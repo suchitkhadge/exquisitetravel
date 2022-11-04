@@ -8,7 +8,7 @@ const openWeatherApiKey = "bee1ae44576d679f5012d45660e1473a";
 
 // to store geo location
 let geo = [];
-const radius = 80000;
+const radius = 10000;
 const rate = 3;
 const limit = 10;
 let city;
@@ -36,6 +36,7 @@ myForm.addEventListener("submit", async (e) => {
   restaurantsBtn.addEventListener("click", showRestaurantList);
   mapBtn.addEventListener("click", getGoogleMap);
   // weatherBtn.addEventListener("click", showWeather);
+  myForm.reset();
 });
 
 // favorite button event handler
@@ -91,6 +92,7 @@ function getGoogleMap() {
   cityMap.setAttribute("src", cityMapSrc);
   cityMap.setAttribute("width", "700px");
   cityMap.setAttribute("height", "500px");
+  cityMap.setAttribute("border", "5px");
   cityMap.setAttribute("id", "googleMap");
   document.getElementById("main-container").innerHTML = "";
   document.getElementById("main-container").appendChild(cityMap);
@@ -257,7 +259,6 @@ async function showBookMark() {
   main_container.appendChild(list);
 
   for (var i = 0; i < localStorage.length; i++) {
-    console.log(localStorage.length);
     const listEle = document.createElement("li");
     const attractionName = JSON.parse(
       localStorage.getItem(localStorage.key(i))
@@ -272,13 +273,12 @@ async function showBookMark() {
     const objLength = Object.keys(
       JSON.parse(localStorage.getItem(localStorage.key(i)))
     );
-    console.log(objLength);
 
     if (objLength.length < 5) {
       modal = await modalCreator(id, attractionName, -1, 0);
     } else {
       const img = JSON.parse(localStorage.getItem(localStorage.key(i))).img;
-      console.log(img);
+
       const type = JSON.parse(localStorage.getItem(localStorage.key(i))).type;
       const address = JSON.parse(
         localStorage.getItem(localStorage.key(i))
@@ -305,7 +305,6 @@ async function getImgDescriptionAddressAndWikiLink(id) {
     const res = await getAttractionDetail(attractionDetailsApi);
     let url;
     let description;
-    let address;
     if (res.data.hasOwnProperty("preview")) {
       url = res.data.preview.source;
     } else {
@@ -316,7 +315,6 @@ async function getImgDescriptionAddressAndWikiLink(id) {
     } else {
       description = `The kinds of this place is: ${res.data.kinds}. Congratulations you find a secret place and we don't have more information about here.`;
     }
-
     const addressObj = res.data.address;
     if (addressObj.hasOwnProperty("house_number")) {
       address = `${addressObj.house_number} ${addressObj.road}, ${addressObj.city}, ${addressObj.state} ${addressObj.postcode}`;
@@ -365,7 +363,7 @@ async function modalCreator3(
   h5Heading.classList.add("modal-title");
   h5Heading.classList.add("fs-5");
   h5Heading.setAttribute("id", "exampleModalLabel");
-  console.log("title is", title);
+
   h5Heading.textContent = title;
   fourthDiv.appendChild(h5Heading);
 
