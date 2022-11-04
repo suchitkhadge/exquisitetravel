@@ -35,21 +35,15 @@ myForm.addEventListener("submit", async (e) => {
   attractionBtn.addEventListener("click", showAttractionsList);
   restaurantsBtn.addEventListener("click", showRestaurantList);
   mapBtn.addEventListener("click", getGoogleMap);
-  weatherBtn.addEventListener("click", showWeather);
+  // weatherBtn.addEventListener("click", showWeather);
 });
+
+
 
 // favorite button event handler
 favoriteBtn.addEventListener("click", showBookMark);
-// generate weather
-function showWeather() {
-  fetch(
-    `${openWeatherBaseURL}lat=${geo[0]}&lon=${geo[1]}&appid=${openWeatherApiKey}`
-  )
-    .then((response) => response.json())
-    .then((data) => console.log(data))
 
-    .catch((err) => alert("City not found!"));
-}
+
 
 // generate attractions list
 function showAttractionsList() {
@@ -69,6 +63,7 @@ async function showRestaurantList() {
       const newRestaurantList = restaurantList.slice(0, 10);
       for (const restaurant of newRestaurantList) {
         const listEle2 = document.createElement("li");
+        listEle2.setAttribute("class", "attraction-style");
         listEle2.textContent = restaurant.name;
         list2.appendChild(listEle2);
         const mapGoogleImg = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&height=400&photo_reference=${restaurant.photos[0].photo_reference}&key=AIzaSyC4qkDl4YCkSCxSe1xwLOxSa5T2W8QWyFc`;
@@ -94,12 +89,12 @@ async function showRestaurantList() {
     });
 }
 
-function getGoogleMap(city) {
+function getGoogleMap() {
   let cityMap = document.createElement("img");
   let cityMapSrc = `${BaseURLGoogle}center=${city}&markers=color:blue%7Clabel:S%7C11211%7C11206%7C11222&zoom=8&size=500x500&key=${googleMapApiKey}`;
   cityMap.setAttribute("src", cityMapSrc);
-  cityMap.setAttribute("width", "400px");
-  cityMap.setAttribute("height", "400px");
+  cityMap.setAttribute("width", "700px");
+  cityMap.setAttribute("height", "500px");
   cityMap.setAttribute("id", "googleMap");
   document.getElementById("main-container").innerHTML = "";
   document.getElementById("main-container").appendChild(cityMap);
@@ -119,6 +114,7 @@ async function callOpenTripApiToGetAttractionsList(api) {
     for (const attraction of data) {
       const listEle = document.createElement("li");
       const attractionName = attraction.properties.name;
+      listEle.setAttribute("class", "attraction-style");
       listEle.textContent = attractionName;
       list.appendChild(listEle);
       const id = attraction.properties.xid;
@@ -258,6 +254,8 @@ function saveOrDeleteBtn(btnId, btnName, disabled) {
 // to retrieve saved items
 async function showBookMark() {
   const list = document.createElement("ul");
+  list.setAttribute("class", "attraction-style");
+
   const main_container = document.querySelector("#main-container");
   main_container.innerHTML = "";
   main_container.appendChild(list);
@@ -347,6 +345,8 @@ async function modalCreator3(
   firstDiv.setAttribute("tabindex", "-1");
   firstDiv.setAttribute("aria-labelledby", "exampleModalLabel");
   firstDiv.setAttribute("aria-hidden", "true");
+  
+ 
 
   const secDiv = document.createElement("div");
   secDiv.classList.add("modal-dialog");
@@ -508,3 +508,5 @@ function CardDivCreatorWithoutWiki(imgUrl, description, address) {
 
   return cardDiv;
 }
+
+
