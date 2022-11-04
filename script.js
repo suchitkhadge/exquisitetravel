@@ -39,15 +39,23 @@ myForm.addEventListener("submit", async (e) => {
   favoriteBtn.addEventListener("click", showBookMark);
 });
 
-// generate weather
+
 function showWeather() {
-  fetch(`${openWeatherBaseURL}lat=${geo[0]}&lon=${geo[1]}&appid=${openWeatherApiKey}`)
-  .then(response => response.json())
-  .then(data => console.log(data))
-  
-  .catch(err => alert("City not found!"))
-  
+  fetch(`http://api.openweathermap.org/data/2.5/weather?lat=${geo[0]}&lon=${geo[1]}&appid=${openWeatherApiKey}`)
+        .then(function(response){
+            let data = response.json();
+            return data;
+        })
+        .then(function(data){
+            weather.temperature.value = Math.floor(data.main.temp - KELVIN);
+            weather.description = data.weather[0].description;
+            weather.iconId = data.weather[0].icon;
+            weather.city = data.name;
+            weather.country = data.sys.country;
+            console.log( weather.city);
+        });
 }
+
 
 // generate attractions list
 function showAttractionsList() {
@@ -67,6 +75,7 @@ async function showRestaurantList() {
     .then(async ({ results: restaurantList }) => {
       for (const restaurant of restaurantList) {
         const listEle2 = document.createElement("li");
+        listEle2.setAttribute("class", "attraction-style");
         listEle2.textContent = restaurant.name;
         list2.appendChild(listEle2);
         const mapGoogleImg = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&height=400&photo_reference=${restaurant.photos[0].photo_reference}&key=AIzaSyC4qkDl4YCkSCxSe1xwLOxSa5T2W8QWyFc`;
@@ -96,23 +105,13 @@ function detailsBtnCreator() {
   return btn;
 }
 
-function modalCreator2() {
-  const firstDiv = document.createElement("div");
-  firstDiv.classList.add("modal");
-  firstDiv.classList.add("fade");
-  firstDiv.setAttribute("id", "exampleModal");
-  firstDiv.setAttribute("tabindex", "-1");
-  firstDiv.setAttribute("aria-labelledby", "exampleModalLabel");
-  firstDiv.setAttribute("aria-hidden", "true");
-  return firstDiv;
-}
 
-function getGoogleMap(city) {
+function getGoogleMap() {
   let cityMap = document.createElement("img");
   let cityMapSrc = `${BaseURLGoogle}center=${city}&markers=color:blue%7Clabel:S%7C11211%7C11206%7C11222&zoom=8&size=500x500&key=${googleMapApiKey}`;
   cityMap.setAttribute("src", cityMapSrc);
-  cityMap.setAttribute("width", "400px");
-  cityMap.setAttribute("height", "400px");
+  cityMap.setAttribute("width", "700px");
+  cityMap.setAttribute("height", "500px");
   cityMap.setAttribute("id", "googleMap");
   document.getElementById("main-container").innerHTML = "";
   document.getElementById("main-container").appendChild(cityMap);
@@ -132,6 +131,7 @@ async function callOpenTripApiToGetAttractionsList(api) {
     for (const attraction of data) {
       const listEle = document.createElement("li");
       const attractionName = attraction.properties.name;
+      listEle.setAttribute("class", "attraction-style");
       listEle.textContent = attractionName;
       list.appendChild(listEle);
       const id = attraction.properties.xid;
@@ -257,6 +257,8 @@ async function modalCreator(id, title, disabled) {
 // to retrieve saved items
 async function showBookMark() {
   const list = document.createElement("ul");
+  list.setAttribute("class", "attraction-style");
+
   const main_container = document.querySelector("#main-container");
   main_container.innerHTML = "";
   main_container.appendChild(list);
@@ -313,6 +315,8 @@ async function modalCreator3(id, title, urls, vicinity) {
   firstDiv.setAttribute("tabindex", "-1");
   firstDiv.setAttribute("aria-labelledby", "exampleModalLabel");
   firstDiv.setAttribute("aria-hidden", "true");
+  
+ 
 
   const secDiv = document.createElement("div");
   secDiv.classList.add("modal-dialog");
@@ -343,7 +347,7 @@ async function modalCreator3(id, title, urls, vicinity) {
   fourthDiv.appendChild(closeBtn);
 
   const url = urls;
-  const des = "Address:";
+  const des = " ";
   const add = vicinity;
 
   const cardDiv = CardDivCreator(url, des, add);
@@ -410,3 +414,5 @@ function CardDivCreator(imgUrl, description, address, wiki) {
   
   return cardDiv;
 }
+
+
