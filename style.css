@@ -4,3 +4,11 @@
     align-content: center;
 
 }
+
+
+#googleMap{
+    border: 5px solid rgb(207, 203, 203);
+    padding: 15px;
+    display: flex;
+    
+}
