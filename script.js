@@ -230,15 +230,16 @@ async function modalCreator(id, title, disabledAdd, disabledDelete) {
     footerBtn.textContent = "Close";
     footerDiv.appendChild(footerBtn);
 
-    const footerSaveBtn = document.createElement("button");
-    footerSaveBtn.setAttribute("type", "button");
-    footerSaveBtn.setAttribute("id", "saveBtn");
-    if (disabledAdd === -1) {
-      footerSaveBtn.setAttribute("disabled", "true");
-    }
-    addClassName(footerSaveBtn, "btn");
-    addClassName(footerSaveBtn, "btn-primary");
-    footerSaveBtn.textContent = "Save";
+    const footerSaveBtn = saveOrDeleteBtn("saveBtn", "Save", disabledAdd);
+    // const footerSaveBtn = document.createElement("button");
+    // footerSaveBtn.setAttribute("type", "button");
+    // footerSaveBtn.setAttribute("id", "saveBtn");
+    // if (disabledAdd === -1) {
+    //   footerSaveBtn.setAttribute("disabled", "true");
+    // }
+    // addClassName(footerSaveBtn, "btn");
+    // addClassName(footerSaveBtn, "btn-primary");
+    // footerSaveBtn.textContent = "Save";
     footerDiv.appendChild(footerSaveBtn);
 
     footerSaveBtn.addEventListener("click", () => {
@@ -252,16 +253,22 @@ async function modalCreator(id, title, disabledAdd, disabledDelete) {
       alert("You just saved this place!");
     });
 
-    const footerDeleteBtn = document.createElement("button");
-    footerDeleteBtn.setAttribute("type", "button");
-    footerDeleteBtn.setAttribute("id", "deleteBtn");
-    if (disabledDelete === -1) {
-      footerDeleteBtn.setAttribute("disabled", "true");
-    }
+    const footerDeleteBtn = saveOrDeleteBtn(
+      "deleteBtn",
+      "Delete",
+      disabledDelete
+    );
 
-    addClassName(footerDeleteBtn, "btn");
-    addClassName(footerDeleteBtn, "btn-primary");
-    footerDeleteBtn.textContent = "Delete";
+    // const footerDeleteBtn = document.createElement("button");
+    // footerDeleteBtn.setAttribute("type", "button");
+    // footerDeleteBtn.setAttribute("id", "deleteBtn");
+    // if (disabledDelete === -1) {
+    //   footerDeleteBtn.setAttribute("disabled", "true");
+    // }
+
+    // addClassName(footerDeleteBtn, "btn");
+    // addClassName(footerDeleteBtn, "btn-primary");
+    // footerDeleteBtn.textContent = "Delete";
     footerDiv.appendChild(footerDeleteBtn);
 
     footerDeleteBtn.addEventListener("click", () => {
@@ -275,6 +282,30 @@ async function modalCreator(id, title, disabledAdd, disabledDelete) {
     console.log(err);
   }
 }
+// create save and delete buttons
+function saveOrDeleteBtn(btnId, btnName, disabled) {
+  const Btn = document.createElement("button");
+  Btn.setAttribute("type", "button");
+  Btn.setAttribute("id", btnId);
+  if (disabled === -1) {
+    Btn.setAttribute("disabled", "true");
+  }
+  addClassName(Btn, "btn");
+  addClassName(Btn, "btn-primary");
+  Btn.textContent = btnName;
+  return Btn;
+}
+// save data to localStorage
+// function saveItem(city, title, add, id) {
+//   const bookmark = {
+//     city: city,
+//     name: title,
+//     location: add,
+//     id: id,
+//   };
+//   localStorage.setItem(title, JSON.stringify(bookmark));
+//   alert("You just saved this place!");
+// }
 
 // to retrieve saved items
 async function showBookMark() {
