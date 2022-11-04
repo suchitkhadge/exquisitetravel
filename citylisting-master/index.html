@@ -5,9 +5,20 @@
         <meta http-equiv="x-ua-compatible" content="ie=edge">
         <title>Exquisite Travel</title>
         <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <link rel="manifest" href="site.webmanifest">
 		<link rel="shortcut icon" type="image/x-icon" href="assets/img/favicon.ico">
+        <link
+        rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+        crossorigin="anonymous"
+      />
+      <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi"
+      crossorigin="anonymous"
+    />
 
 		<!-- CSS here -->
             <link rel="stylesheet" href="assets/css/bootstrap.min.css">
@@ -30,7 +41,7 @@
             <div class="preloader-inner position-relative">
                 <div class="preloader-circle"></div>
                 <div class="preloader-img pere-text">
-                    <img src="assets/img/logo/logo.png" alt="">
+                    <img src="assets/img/logo/loder.jpg" alt="">
                 </div>
             </div>
         </div>
@@ -40,32 +51,34 @@
         <!-- Header Start -->
        <div class="header-area header-transparent">
             <div class="main-header">
-               <div class="header-bottom  header-sticky">
+               <div class="header-bottom header-sticky">
                     <div class="container-fluid">
                         <div class="row align-items-center">
                             <!-- Logo -->
                             <div class="col-xl-2 col-lg-2 col-md-1">
                                 <div class="logo">
-                                  <a href="index.html"><img src="https://media.travelinsurancedirect.co.nz/images/amt_globe.png" alt=""></a>
+                                  <a href="index.html"><img src="https://media.travelinsurancedirect.co.nz/images/amt_globe.png" alt="world travel image"></a>
                                 </div>
                             </div>
                             <div class="col-xl-10 col-lg-10 col-md-8">
-                                <!-- Main-menu -->
-                                <div class="main-menu f-right d-none d-lg-block">
-                                    <nav>
-                                        
+                                <!--  -->
+                                <div class="myForm f-right d-none d-lg-block">
+                                    
+                                    <div class="btn-group btn-group-sm" role="group" aria-label="Small button group"> 
                                         <section id="button-container">
-                                            <div class="btn-group btn-group-sm" role="group" aria-label="Small button group"></div>                                                                                                                                     
-                                            <button type="button" class="btn btn-outline-primary"><a href="">Weather</a></button>
-                                            <button type="button" class="btn btn-outline-primary"><a href="">Attractions</a></button>
-                                            <button type="button" class="btn btn-outline-primary"<a href="">Restaurants</a></button>
-                                            <button type="button" class="btn btn-outline-primary"><a href="">Map</a></button>
-                                          
-                                    </section>
-                                   
-                                    </nav>
+                                                                                                                                                                           
+                                            <button type="button" class="btn btn-outline-primary" id="weatherBtn">Weather</button>
+                                            <button type="button" class="btn btn-outline-primary" id="attractionBtn">Attractions</button>
+                                            <button type="button" class="btn btn-outline-primary">Restaurants</button>
+                                            <button type="button" class="btn btn-outline-primary">Map</button>  
+                                              
+                                        </section>
+                                    </div> 
+                                    
                                 </div>
                             </div>
+                        </div>
+                            
                             <!-- Mobile Menu -->
                             <div class="col-12">
                                 <div class="mobile_menu d-block d-lg-none"></div>
@@ -86,14 +99,15 @@
                     <div class="row justify-content-center">
                         <div class="col-xl-8 col-lg-9">
                             <!-- Hero Caption -->
-                            <div class="hero__caption">
+                            <div>
+                                <div class="hero__caption">
                                 <span>Never Stop Exploring the World!</span>
                                 <h1>Discover New Places</h1>
+                                </div>
                             </div>
-                            <!--Hero form -->
-                            <form action="#" class="search-box">
+                            <form action="myForm" class="search-box">
                                 <div class="input-form">
-                                    <input type="text" placeholder="Enter your destination here">
+                                    <input type="text" name="" id="user_input" placeholder="Type your dream city">
                                 </div>
                                 <div class="search-form">
                                     <a href="#">Search</a>
