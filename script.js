@@ -36,14 +36,11 @@ myForm.addEventListener("submit", async (e) => {
   restaurantsBtn.addEventListener("click", showRestaurantList);
   mapBtn.addEventListener("click", getGoogleMap);
   // weatherBtn.addEventListener("click", showWeather);
+  myForm.reset();
 });
-
-
 
 // favorite button event handler
 favoriteBtn.addEventListener("click", showBookMark);
-
-
 
 // generate attractions list
 function showAttractionsList() {
@@ -262,7 +259,6 @@ async function showBookMark() {
   main_container.appendChild(list);
 
   for (var i = 0; i < localStorage.length; i++) {
-    console.log(localStorage.length);
     const listEle = document.createElement("li");
     const attractionName = JSON.parse(
       localStorage.getItem(localStorage.key(i))
@@ -277,13 +273,12 @@ async function showBookMark() {
     const objLength = Object.keys(
       JSON.parse(localStorage.getItem(localStorage.key(i)))
     );
-    console.log(objLength);
 
     if (objLength.length < 5) {
       modal = await modalCreator(id, attractionName, -1, 0);
     } else {
       const img = JSON.parse(localStorage.getItem(localStorage.key(i))).img;
-      console.log(img);
+
       const type = JSON.parse(localStorage.getItem(localStorage.key(i))).type;
       const address = JSON.parse(
         localStorage.getItem(localStorage.key(i))
@@ -321,7 +316,12 @@ async function getImgDescriptionAddressAndWikiLink(id) {
       description = `The kinds of this place is: ${res.data.kinds}. Congratulations you find a secret place and we don't have more information about here.`;
     }
     const addressObj = res.data.address;
-    const address = `${addressObj.house_number} ${addressObj.road}, ${addressObj.city}, ${addressObj.state} ${addressObj.postcode}`;
+    if (addressObj.hasOwnProperty("house_number")) {
+      address = `${addressObj.house_number} ${addressObj.road}, ${addressObj.city}, ${addressObj.state} ${addressObj.postcode}`;
+    } else {
+      address =
+        "We don't have address information for this place but you may find more information in wikipedia.";
+    }
     const wikiLink = res.data.wikipedia;
     return [url, description, address, wikiLink];
   } catch (err) {
@@ -346,8 +346,6 @@ async function modalCreator3(
   firstDiv.setAttribute("tabindex", "-1");
   firstDiv.setAttribute("aria-labelledby", "exampleModalLabel");
   firstDiv.setAttribute("aria-hidden", "true");
-  
- 
 
   const secDiv = document.createElement("div");
   secDiv.classList.add("modal-dialog");
@@ -365,7 +363,7 @@ async function modalCreator3(
   h5Heading.classList.add("modal-title");
   h5Heading.classList.add("fs-5");
   h5Heading.setAttribute("id", "exampleModalLabel");
-  console.log("title is", title);
+
   h5Heading.textContent = title;
   fourthDiv.appendChild(h5Heading);
 
@@ -509,5 +507,3 @@ function CardDivCreatorWithoutWiki(imgUrl, description, address) {
 
   return cardDiv;
 }
-
-
