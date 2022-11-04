@@ -57,7 +57,7 @@ function showAttractionsList() {
   const attractionsAPi = `${openTripBaseURL}radius?radius=${radius}&lon=${geo[1]}&lat=${geo[0]}&src_attr=wikidata&kinds=amusements%2Cinteresting_places&rate=${rate}&apikey=${opentripApiKey}&limit=${limit}&SameSite=None`;
   callOpenTripApiToGetAttractionsList(attractionsAPi);
 }
-
+// generate restaurants list
 async function showRestaurantList() {
   document.getElementById("main-container").innerHTML = " ";
   const list2 = document.createElement("ul");
@@ -92,28 +92,6 @@ async function showRestaurantList() {
       }
       console.log(restaurantList);
     });
-}
-
-function detailsBtnCreator() {
-  const btn = document.createElement("button");
-  btn.textContent = "Details";
-  btn.setAttribute("type", "button");
-  btn.classList.add("btn");
-  btn.classList.add("btn-primary");
-  btn.setAttribute("data-bs-toggle", "modal");
-  btn.setAttribute("data-bs-target", "#exampleModal");
-  return btn;
-}
-
-function modalCreator2() {
-  const firstDiv = document.createElement("div");
-  firstDiv.classList.add("modal");
-  firstDiv.classList.add("fade");
-  firstDiv.setAttribute("id", "exampleModal");
-  firstDiv.setAttribute("tabindex", "-1");
-  firstDiv.setAttribute("aria-labelledby", "exampleModalLabel");
-  firstDiv.setAttribute("aria-hidden", "true");
-  return firstDiv;
 }
 
 function getGoogleMap(city) {
@@ -297,15 +275,29 @@ async function showBookMark() {
     const btn = detailsBtnCreator(id);
     listEle.appendChild(btn);
     let modal;
+    const objLength = Object.keys(
+      JSON.parse(localStorage.getItem(localStorage.key(i)))
+    );
+    console.log(objLength);
 
-    if (
-      Object.keys(JSON.parse(localStorage.getItem(localStorage.key(i)))) < 5
-    ) {
+    if (objLength.length < 5) {
       modal = await modalCreator(id, attractionName, -1, 0);
     } else {
       const img = JSON.parse(localStorage.getItem(localStorage.key(i))).img;
+      console.log(img);
       const type = JSON.parse(localStorage.getItem(localStorage.key(i))).type;
-      modal = await modalCreator3(id, attractionName, img, type, -1, 0);
+      const address = JSON.parse(
+        localStorage.getItem(localStorage.key(i))
+      ).location;
+      modal = await modalCreator3(
+        id,
+        attractionName,
+        img,
+        address,
+        type,
+        -1,
+        0
+      );
     }
 
     listEle.appendChild(modal);
@@ -338,6 +330,7 @@ async function getImgDescriptionAddressAndWikiLink(id) {
   }
 }
 
+// create pop-up modal for restaurants
 async function modalCreator3(
   id,
   title,
@@ -383,7 +376,7 @@ async function modalCreator3(
   fourthDiv.appendChild(closeBtn);
 
   const url = urls;
-  const des = `Type of this restaurant: ${type}`;
+  const des = type;
   const add = vicinity;
 
   const cardDiv = CardDivCreatorWithoutWiki(url, des, add);
