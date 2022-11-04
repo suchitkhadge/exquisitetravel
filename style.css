@@ -1,34 +1,37 @@
-#googleMap {
-  padding: 5px;
+#googleMap{
   display: flex;
   border-radius: 70px;
+  border: solid 5px;
+  
 }
-body {
-  /* padding-top: 200px; */
-  background-image: url("/travel.avif");
+body{
+  background-image:url("/travel.avif");
   min-width: 100%;
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
-  font-family: "Sulphur Point", sans-serif;
+  font-family: "Sulphur Point",sans-serif;
   font-weight: normal;
   font-style: normal;
 }
 
-#main-container {
-  display: flex;
-  justify-content: center;
+#main-container{
+  display:flex;
+  justify-content: center
+
 }
 
-#button-container {
+
+#button-container{
   display: flex;
   justify-content: center;
   border-radius: 2px;
 }
 
-.attraction-style {
-  color: aliceblue;
-  font-style: normal;
+
+.attraction-style{
+  color:aliceblue;
+  font-style:normal;
   font-family: Arial, Helvetica, sans-serif;
   font-size: large;
   border: solid;
@@ -37,28 +40,30 @@ body {
   padding: 5px;
   margin-bottom: 5px;
   font-weight: bold;
-  background-color: rgb(234, 167, 125);
+  background-color: rgb(2202, 105, 70, 0.796);
 }
 
-#myForm {
+#myForm{
   display: flex;
   justify-content: center;
-  margin-top: 10%;
+  margin-top: ;;
+  
 }
 
-.card-body {
-  background-color: rgba(223, 105, 62, 0.796);
+.card-body{
+  background-color:rgba(223, 105, 62, 0.796);
 }
-.list-group-item {
-  background-color: rgba(223, 105, 62, 0.796);
+.list-group-item{
+  background-color:rgba(223, 105, 62, 0.796);
+  margin: 5px;
 }
-.modal-header {
-  background-color: rgba(223, 105, 62, 0.796);
+.modal-header{
+  background-color:rgba(223, 105, 62, 0.796);
 }
-.modal-footer {
-  background-color: rgba(223, 105, 62, 0.796);
+.modal-footer{
+  background-color:rgba(223, 105, 62, 0.796);
 }
-#user_input {
+#user_input{
   width: 45%;
   position: relative;
   border-top-left-radius: 50px;
@@ -66,33 +71,35 @@ body {
   border-bottom-left-radius: 50px;
   border-top-right-radius: 50px;
   border-bottom-right-radius: 50px;
+
 }
 
-.btn-warning {
-  margin: 10px;
-  font-weight: bold;
-  font-size: larger;
+.btn-warning{
+margin: 10px;
+font-weight: bold;
+font-size:larger;
 }
 
-#submitBtn {
+#submitBtn{
   border-radius: 10px;
-}
+  font-weight: bold;
+  }
 
-.btn-primary {
+.btn-primary{
   margin: 5px;
-  background-color: rgba(202, 105, 70, 0.796);
+  background-color:rgb(143, 115, 115);
   border: solid;
-  border-color: rgb(228, 139, 75);
+  border-radius: 25px;
+
 }
 
-#header-style {
+#header-style{
   display: flex;
   justify-content: center;
-  color: rgb(208, 86, 86);
-  font-weight: bold;
+  color: rgb(30, 25, 25);
+  font-family: 'Island Moments', cursive;
+  font-size: 160px;
+  font-weight: bolder;
 }
 
-body,
-html {
-  height: 100%;
-}
+body, html {height: 100%}
